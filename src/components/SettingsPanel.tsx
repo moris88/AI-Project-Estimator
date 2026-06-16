@@ -8,7 +8,7 @@ interface SettingsPanelProps {
 }
 
 const MODEL_SUGGESTIONS: Record<AIProvider, string[]> = {
-	gemini: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-2.0-flash-exp'],
+	gemini: ['gemini-2.5-fresh', 'gemini-3.5-flash'],
 	openai: ['gpt-4o', 'gpt-4o-mini', 'o1-preview', 'gpt-4-turbo'],
 	anthropic: [
 		'claude-3-5-sonnet-latest',
@@ -18,7 +18,7 @@ const MODEL_SUGGESTIONS: Record<AIProvider, string[]> = {
 }
 
 const DEFAULT_MODELS: Record<AIProvider, string> = {
-	gemini: 'gemini-1.5-pro',
+	gemini: 'gemini-2.5-fresh',
 	openai: 'gpt-4o',
 	anthropic: 'claude-3-5-sonnet-latest',
 }
