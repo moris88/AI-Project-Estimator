@@ -1,5 +1,5 @@
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { CheckCircle2, Download, FileText, Loader2, Send } from 'lucide-react'
+import { CheckCircle2, Download, Loader2, Send } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { EstimationResult, ProjectInfo } from '../types'
@@ -78,7 +78,7 @@ export const ResultView = ({
 								/>
 							}
 							fileName={`stima_${Date.now()}.pdf`}
-							className="flex items-center gap-2 font-medium text-blue-600 text-sm transition-colors hover:text-blue-800"
+							className="flex cursor-pointer items-center gap-2 rounded-lg border border-blue-600 px-3 py-1 font-medium text-blue-600 text-sm transition-colors hover:border-blue-800 hover:text-blue-800"
 						>
 							{({ loading: pdfLoading }) =>
 								pdfLoading ? (
@@ -91,14 +91,6 @@ export const ResultView = ({
 								)
 							}
 						</PDFDownloadLink>
-						<button
-							type="button"
-							onClick={() => window.print()}
-							className="flex items-center gap-2 font-medium text-slate-500 text-sm transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-						>
-							<FileText className="h-4 w-4" />
-							Stampa
-						</button>
 					</div>
 				</div>
 

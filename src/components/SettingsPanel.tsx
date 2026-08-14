@@ -1,8 +1,8 @@
 import { Code2, Cpu, Settings as SettingsIcon, Sparkles } from 'lucide-react'
-import type { AIProvider, AppSettings } from '../types'
-import { cn } from '../utils/cn'
 import React from 'react'
 import { getModels } from '../lib/utils'
+import type { AIProvider, AppSettings } from '../types'
+import { cn } from '../utils/cn'
 
 interface SettingsPanelProps {
 	settings: AppSettings
@@ -19,21 +19,24 @@ export const SettingsPanel = ({
 	settings,
 	onSettingsChange,
 }: SettingsPanelProps) => {
-	const [availableModels, setAvailableModels] = React.useState<string[]>([]);
+	const [availableModels, setAvailableModels] = React.useState<string[]>([])
 
 	React.useEffect(() => {
-		getModels(settings.provider, settings[`${settings.provider}Key`]).then((models) => {
-			setAvailableModels(models);
-		});
-	}, [settings.provider, settings[`${settings.provider}Key`]]);
+		getModels(settings.provider, settings[`${settings.provider}Key`]).then(
+			(models) => {
+				setAvailableModels(models)
+			},
+		)
+	}, [settings.provider, settings[`${settings.provider}Key`]])
 
 	const options = availableModels.map((model) => (
 		<option key={model} value={model}>
 			{model}
 		</option>
-	));
+	))
 
-	const disabledOptions = availableModels.length === 0 || !settings[`${settings.provider}Key`];
+	const disabledOptions =
+		availableModels.length === 0 || !settings[`${settings.provider}Key`]
 	const handleProviderChange = (newProvider: AIProvider) => {
 		onSettingsChange({
 			...settings,
@@ -42,7 +45,7 @@ export const SettingsPanel = ({
 		})
 	}
 
-	const modelName = settings.model || DEFAULT_MODELS[settings.provider];
+	const modelName = settings.model || DEFAULT_MODELS[settings.provider]
 	const handleModelChange = (newModel: string) => {
 		onSettingsChange({
 			...settings,
@@ -126,7 +129,7 @@ export const SettingsPanel = ({
 							<div>
 								<label
 									htmlFor="model-name"
-									className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+									className="block font-semibold text-slate-700 text-sm dark:text-slate-300"
 								>
 									Modello
 								</label>
@@ -135,7 +138,7 @@ export const SettingsPanel = ({
 									disabled={disabledOptions}
 									value={modelName}
 									onChange={(e) => handleModelChange(e.target.value)}
-									className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+									className="w-full rounded-lg border border-slate-200 bg-slate-50 p-3 outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 								>
 									{options}
 								</select>

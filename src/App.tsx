@@ -6,6 +6,16 @@ import { SettingsPanel } from './components/SettingsPanel'
 import { useEstimate } from './hooks/useEstimate'
 import type { AppSettings, ProjectInfo } from './types'
 
+const EMPTY_PROJECT_INFO: ProjectInfo = {
+	techStack: '',
+	scope: 'Frontend',
+	type: 'new',
+	requirements: '',
+	notes: '',
+	existingContext: '',
+	previousEstimates: [],
+}
+
 export default function App() {
 	const [darkMode, setDarkMode] = useState(() => {
 		const saved = localStorage.getItem('stime-dark-mode')
@@ -26,20 +36,13 @@ export default function App() {
 			}
 	})
 
-	const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
-		techStack: '',
-		scope: 'Frontend',
-		type: 'new',
-		requirements: '',
-		notes: '',
-		existingContext: '',
-	})
+	const [projectInfo, setProjectInfo] = useState<ProjectInfo>(EMPTY_PROJECT_INFO)
 	const [selectedTechs, setSelectedTechs] = useState<string[]>([])
 	const [showSettings, setShowSettings] = useState(
 		!settings.geminiKey && !settings.openaiKey && !settings.anthropicKey,
 	)
 
-	const { generateEstimate, loading, result, error } = useEstimate(
+	const { generateEstimate, resetEstimate, loading, result, error } = useEstimate(
 		settings,
 		projectInfo,
 		selectedTechs,
@@ -69,6 +72,12 @@ export default function App() {
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 		generateEstimate(() => setShowSettings(true))
+	}
+
+	const handleReset = () => {
+		setProjectInfo({ ...EMPTY_PROJECT_INFO, previousEstimates: [] })
+		setSelectedTechs([])
+		resetEstimate()
 	}
 
 	const hasApiKey = Boolean(
@@ -101,6 +110,7 @@ export default function App() {
 							onToggleTech={handleToggleTech}
 							onSubmit={handleSubmit}
 							loading={loading}
+							onReset={handleReset}
 							error={error}
 							provider={settings.provider}
 							model={settings.model}

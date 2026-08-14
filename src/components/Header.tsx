@@ -32,10 +32,16 @@ export const Header = ({
 						type="button"
 						onClick={onToggleDarkMode}
 						className="rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-						aria-label={darkMode ? 'Attiva modalità chiara' : 'Attiva modalità scura'}
+						aria-label={
+							darkMode ? 'Attiva modalità chiara' : 'Attiva modalità scura'
+						}
 						title={darkMode ? 'Modalità chiara' : 'Modalità scura'}
 					>
-						{darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+						{darkMode ? (
+							<Sun className="h-5 w-5" />
+						) : (
+							<Moon className="h-5 w-5" />
+						)}
 					</button>
 					<button
 						type="button"

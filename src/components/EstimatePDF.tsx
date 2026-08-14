@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import type { ReactNode } from 'react'
 
 const styles = StyleSheet.create({
 	page: {
@@ -38,21 +39,29 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	h1: {
-		fontSize: 16,
+		fontSize: 13,
 		fontWeight: 'bold',
 		color: '#1e40af',
 		borderBottom: 1,
 		borderBottomColor: '#e2e8f0',
 		paddingBottom: 5,
+		marginTop: 15,
 		marginBottom: 10,
 		textTransform: 'uppercase',
 	},
 	h2: {
-		fontSize: 13,
+		fontSize: 12,
 		fontWeight: 'bold',
 		color: '#1e3a8a',
-		marginTop: 15,
+		marginTop: 14,
 		marginBottom: 8,
+	},
+	h3: {
+		fontSize: 11,
+		fontWeight: 'bold',
+		color: '#1e40af',
+		marginTop: 10,
+		marginBottom: 6,
 	},
 	paragraph: {
 		marginBottom: 8,
@@ -61,15 +70,26 @@ const styles = StyleSheet.create({
 	listItem: {
 		flexDirection: 'row',
 		marginBottom: 4,
-		paddingLeft: 15,
+		paddingLeft: 12,
 	},
 	bullet: {
 		width: 15,
 		fontWeight: 'bold',
+		color: '#2563eb',
 	},
 	bold: {
 		fontWeight: 'bold',
 		color: '#0f172a',
+	},
+	italic: {
+		fontStyle: 'italic',
+	},
+	code: {
+		fontFamily: 'Courier',
+		backgroundColor: '#f1f5f9',
+	},
+	strikethrough: {
+		textDecoration: 'line-through',
 	},
 	table: {
 		marginTop: 10,
@@ -131,28 +151,38 @@ interface EstimatePDFProps {
 export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 	const lines = content.split('\n')
 
-	// Helper per gestire il grassetto inline **text**
-	const renderTextWithBold = (text: string) => {
-		const parts = text.split(/(\*\*.*?\*\*)/g)
-		return parts.map((part, i) => {
-			if (part.startsWith('**') && part.endsWith('**')) {
-				return (
-					<Text key={i} style={styles.bold}>
-						{part.slice(2, -2)}
-					</Text>
-				)
+	const renderInlineMarkdown = (text: string): ReactNode[] => {
+		const parts = text.split(
+			/(\*\*[^*]+\*\*|__[^_]+__|~~[^~]+~~|`[^`]+`|\[[^\]]+\]\([^)]+\)|\*[^*]+\*|_[^_]+_)/g,
+		)
+
+		return parts.map((part, index) => {
+			if (!part) return null
+			if (part.startsWith('**') || part.startsWith('__')) {
+				return <Text key={index} style={styles.bold}>{part.slice(2, -2)}</Text>
 			}
-			return part
+			if (part.startsWith('~~')) {
+				return <Text key={index} style={styles.strikethrough}>{part.slice(2, -2)}</Text>
+			}
+			if (part.startsWith('`')) {
+				return <Text key={index} style={styles.code}>{part.slice(1, -1)}</Text>
+			}
+			if (part.startsWith('[')) {
+				return <Text key={index}>{part.replace(/^\[([^\]]+)\]\([^)]+\)$/, '$1')}</Text>
+			}
+			if (part.startsWith('*') || part.startsWith('_')) {
+				return <Text key={index} style={styles.italic}>{part.slice(1, -1)}</Text>
+			}
+			return <Text key={index}>{part}</Text>
 		})
 	}
 
-	// Helper per rilevare se una riga è parte di una tabella markdown
 	const isTableRow = (line: string) =>
 		line.includes('|') && line.trim().startsWith('|')
 
 	const renderTable = (rows: string[]) => {
 		const data = rows
-			.filter((row) => !row.includes('---')) // Rimuove la riga di separazione |---|
+			.filter((row) => !row.includes('---'))
 			.map((row) =>
 				row
 					.split('|')
@@ -169,7 +199,7 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 					>
 						{row.map((cell, cellIndex) => (
 							<Text key={cellIndex} style={styles.tableCell}>
-								{cell}
+								{renderInlineMarkdown(cell)}
 							</Text>
 						))}
 					</View>
@@ -178,10 +208,11 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 		)
 	}
 
+	// Elaborazione dei blocchi
 	const processedBlocks: any[] = []
 	let currentTable: string[] = []
 
-	lines.forEach((line, _index) => {
+	lines.forEach((line) => {
 		if (isTableRow(line)) {
 			currentTable.push(line)
 		} else {
@@ -194,6 +225,11 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 			}
 		}
 	})
+
+	// Flush di un'eventuale tabella a fine documento
+	if (currentTable.length > 0) {
+		processedBlocks.push({ type: 'table', data: [...currentTable] })
+	}
 
 	return (
 		<Document title="Stima Progetto Software">
@@ -243,35 +279,41 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 							return renderTable(block.data)
 						}
 
-						const line = block.data
-						if (line.startsWith('# ')) {
+						const line = block.data.trim()
+
+						// 1. Riconoscimento Titoli (Tolti i cancelletti iniziali e finali)
+						const headingMatch = line.match(/^#{1,6}\s*(.*?)\s*#*$/)
+						if (line.startsWith('#') && headingMatch) {
+							const level = line.match(/^(#{1,6})/)?.[1].length || 1
+							const titleText = headingMatch[1]
+							const headingStyle =
+								level === 1 ? styles.h1 : level === 2 ? styles.h2 : styles.h3
+
 							return (
-								<Text key={i} style={styles.h1}>
-									{line.replace('# ', '')}
+								<Text key={i} style={headingStyle}>
+									{renderInlineMarkdown(titleText)}
 								</Text>
 							)
 						}
-						if (line.startsWith('## ')) {
-							return (
-								<Text key={i} style={styles.h2}>
-									{line.replace('## ', '')}
-								</Text>
-							)
-						}
-						if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+
+						// 2. Riconoscimento Liste (Puntate e Numerate)
+						const listMatch = line.match(/^([-*+]|\d+\.)\s+(.+)$/)
+						if (listMatch) {
+							const bulletSymbol = listMatch[1].match(/\d+\./) ? listMatch[1] : '•'
 							return (
 								<View key={i} style={styles.listItem}>
-									<Text style={styles.bullet}>•</Text>
+									<Text style={styles.bullet}>{bulletSymbol}</Text>
 									<Text style={{ flex: 1 }}>
-										{renderTextWithBold(line.trim().substring(2))}
+										{renderInlineMarkdown(listMatch[2])}
 									</Text>
 								</View>
 							)
 						}
 
+						// 3. Paragrafo standard
 						return (
 							<Text key={i} style={styles.paragraph}>
-								{renderTextWithBold(line)}
+								{renderInlineMarkdown(line)}
 							</Text>
 						)
 					})}
@@ -280,7 +322,7 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 				<Text
 					style={styles.footer}
 					render={({ pageNumber, totalPages }) =>
-						`Pagina ${pageNumber} di ${totalPages}  |  AI Project Estimator  |  Generated on ${new Date().toLocaleDateString()}`
+						`Pagina ${pageNumber} di ${totalPages}  |  AI Project Estimator  |  Generato il ${new Date().toLocaleDateString('it-IT')}`
 					}
 					fixed
 				/>
