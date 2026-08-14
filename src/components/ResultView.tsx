@@ -24,11 +24,11 @@ export const ResultView = ({
 }: ResultViewProps) => {
 	if (!result && !loading) {
 		return (
-			<div className="flex h-full min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-slate-200 border-dashed p-8 text-center text-slate-400">
-				<div className="mb-4 rounded-full bg-slate-100 p-4">
+			<div className="flex h-full min-h-100 flex-col items-center justify-center rounded-xl border-2 border-slate-200 border-dashed p-8 text-center text-slate-400 dark:border-slate-800">
+				<div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-slate-900">
 					<Send className="h-8 w-8" />
 				</div>
-				<h3 className="mb-1 font-medium text-lg text-slate-600">
+				<h3 className="mb-1 font-medium text-lg text-slate-600 dark:text-slate-300">
 					Pronto per iniziare?
 				</h3>
 				<p className="max-w-xs">
@@ -41,9 +41,9 @@ export const ResultView = ({
 
 	if (loading) {
 		return (
-			<div className="flex h-full min-h-[400px] animate-pulse flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-8">
+			<div className="flex h-full min-h-100 animate-pulse flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900">
 				<Loader2 className="mb-4 h-12 w-12 animate-spin text-blue-600" />
-				<p className="font-medium text-slate-600">
+				<p className="font-medium text-slate-600 dark:text-slate-300">
 					L'AI sta analizzando i requisiti...
 				</p>
 				<p className="text-slate-400 text-sm">
@@ -57,9 +57,9 @@ export const ResultView = ({
 
 	return (
 		<div className="fade-in zoom-in-95 animate-in space-y-8 duration-500">
-			<div className="prose prose-slate max-w-none prose-table:rounded-lg rounded-xl border prose-table:border border-slate-200 bg-white p-8 prose-headings:font-bold prose-a:text-blue-600 prose-headings:text-slate-900 shadow-sm">
+			<div className="prose prose-slate dark:prose-invert max-w-none prose-table:rounded-lg rounded-xl border prose-table:border border-slate-200 bg-white p-8 prose-headings:font-bold prose-a:text-blue-600 prose-headings:text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:prose-headings:text-slate-100">
 				<div className="not-prose mb-6 flex items-center justify-between">
-					<div className="flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 font-semibold text-green-600 text-sm">
+					<div className="flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 font-semibold text-green-600 text-sm dark:bg-green-950 dark:text-green-300">
 						<CheckCircle2 className="h-4 w-4" />
 						Stima Generata con Successo
 					</div>
@@ -94,7 +94,7 @@ export const ResultView = ({
 						<button
 							type="button"
 							onClick={() => window.print()}
-							className="flex items-center gap-2 font-medium text-slate-500 text-sm transition-colors hover:text-slate-800"
+							className="flex items-center gap-2 font-medium text-slate-500 text-sm transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
 						>
 							<FileText className="h-4 w-4" />
 							Stampa
@@ -109,7 +109,7 @@ export const ResultView = ({
 				</div>
 
 				{result.sprints && (
-					<div className="mt-12 border-slate-200 border-t pt-12">
+					<div className="mt-12 border-slate-200 border-t pt-12 dark:border-slate-800">
 						<ReactMarkdown remarkPlugins={[remarkGfm]}>
 							{result.sprints}
 						</ReactMarkdown>

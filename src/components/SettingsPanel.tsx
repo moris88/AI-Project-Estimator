@@ -1,32 +1,39 @@
 import { Code2, Cpu, Settings as SettingsIcon, Sparkles } from 'lucide-react'
 import type { AIProvider, AppSettings } from '../types'
 import { cn } from '../utils/cn'
+import React from 'react'
+import { getModels } from '../lib/utils'
 
 interface SettingsPanelProps {
 	settings: AppSettings
 	onSettingsChange: (settings: AppSettings) => void
 }
 
-const MODEL_SUGGESTIONS: Record<AIProvider, string[]> = {
-	gemini: ['gemini-2.5-fresh', 'gemini-3.5-flash'],
-	openai: ['gpt-4o', 'gpt-4o-mini', 'o1-preview', 'gpt-4-turbo'],
-	anthropic: [
-		'claude-3-5-sonnet-latest',
-		'claude-3-5-haiku-latest',
-		'claude-3-opus-latest',
-	],
-}
-
 const DEFAULT_MODELS: Record<AIProvider, string> = {
-	gemini: 'gemini-2.5-fresh',
-	openai: 'gpt-4o',
-	anthropic: 'claude-3-5-sonnet-latest',
+	gemini: '',
+	openai: '',
+	anthropic: '',
 }
 
 export const SettingsPanel = ({
 	settings,
 	onSettingsChange,
 }: SettingsPanelProps) => {
+	const [availableModels, setAvailableModels] = React.useState<string[]>([]);
+
+	React.useEffect(() => {
+		getModels(settings.provider, settings[`${settings.provider}Key`]).then((models) => {
+			setAvailableModels(models);
+		});
+	}, [settings.provider, settings[`${settings.provider}Key`]]);
+
+	const options = availableModels.map((model) => (
+		<option key={model} value={model}>
+			{model}
+		</option>
+	));
+
+	const disabledOptions = availableModels.length === 0 || !settings[`${settings.provider}Key`];
 	const handleProviderChange = (newProvider: AIProvider) => {
 		onSettingsChange({
 			...settings,
@@ -35,16 +42,24 @@ export const SettingsPanel = ({
 		})
 	}
 
+	const modelName = settings.model || DEFAULT_MODELS[settings.provider];
+	const handleModelChange = (newModel: string) => {
+		onSettingsChange({
+			...settings,
+			model: newModel,
+		})
+	}
+
 	return (
-		<div className="fade-in slide-in-from-top-4 mb-8 animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-sm duration-300">
-			<div className="mb-6 flex items-center gap-2 border-slate-100 border-b pb-4">
+		<div className="fade-in slide-in-from-top-4 mb-8 animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-sm duration-300 dark:border-slate-800 dark:bg-slate-900">
+			<div className="mb-6 flex items-center gap-2 border-slate-100 border-b pb-4 dark:border-slate-800">
 				<SettingsIcon className="h-5 w-5 text-blue-600" />
 				<h2 className="font-semibold text-lg">Configurazione AI Provider</h2>
 			</div>
 
 			<div className="grid grid-cols-1 gap-8 md:grid-cols-12">
 				<div className="md:col-span-4 lg:col-span-3">
-					<span className="mb-3 block font-medium text-slate-700 text-sm">
+					<span className="mb-3 block font-medium text-slate-700 text-sm dark:text-slate-300">
 						Provider AI Attivo
 					</span>
 					<div className="space-y-2">
@@ -56,8 +71,8 @@ export const SettingsPanel = ({
 								className={cn(
 									'flex w-full items-center gap-3 rounded-lg border p-3 font-medium transition-all',
 									settings.provider === p
-										? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm'
-										: 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
+										? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+										: 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
 								)}
 							>
 								<div
@@ -65,7 +80,7 @@ export const SettingsPanel = ({
 										'rounded-md p-1.5',
 										settings.provider === p
 											? 'bg-blue-600 text-white'
-											: 'bg-slate-100 text-slate-500',
+											: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
 									)}
 								>
 									{p === 'gemini' && <Sparkles className="h-4 w-4" />}
@@ -83,7 +98,7 @@ export const SettingsPanel = ({
 						<div>
 							<label
 								htmlFor="providerApiKey"
-								className="mb-1 block font-medium text-slate-700 text-sm"
+								className="mb-1 block font-medium text-slate-700 text-sm dark:text-slate-300"
 							>
 								{settings.provider.toUpperCase()} API Key
 							</label>
@@ -104,41 +119,26 @@ export const SettingsPanel = ({
 									})
 								}
 								placeholder={`Incolla la tua ${settings.provider} API key...`}
-								className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
+								className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
 							/>
 						</div>
 						<div>
-							<label
-								htmlFor="modelInput"
-								className="mb-1 block font-medium text-slate-700 text-sm"
-							>
-								Modello (Nome Libero)
-							</label>
-							<div className="relative">
-								<input
-									id="modelInput"
-									type="text"
-									value={settings.model}
-									onChange={(e) =>
-										onSettingsChange({ ...settings, model: e.target.value })
-									}
-									placeholder="Es: gpt-4o, claude-3-5-sonnet..."
-									className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
-								/>
-								<div className="mt-2 flex flex-wrap gap-2">
-									{MODEL_SUGGESTIONS[settings.provider].map((m) => (
-										<button
-											key={m}
-											type="button"
-											onClick={() =>
-												onSettingsChange({ ...settings, model: m })
-											}
-											className="rounded-full bg-slate-100 px-3 py-1 font-medium text-[10px] text-slate-600 transition-colors hover:bg-slate-200"
-										>
-											{m}
-										</button>
-									))}
-								</div>
+							<div>
+								<label
+									htmlFor="model-name"
+									className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+								>
+									Modello
+								</label>
+								<select
+									id="model-name"
+									disabled={disabledOptions}
+									value={modelName}
+									onChange={(e) => handleModelChange(e.target.value)}
+									className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+								>
+									{options}
+								</select>
 							</div>
 						</div>
 					</div>

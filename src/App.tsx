@@ -7,17 +7,23 @@ import { useEstimate } from './hooks/useEstimate'
 import type { AppSettings, ProjectInfo } from './types'
 
 export default function App() {
+	const [darkMode, setDarkMode] = useState(() => {
+		const saved = localStorage.getItem('stime-dark-mode')
+		return saved === null
+			? window.matchMedia('(prefers-color-scheme: dark)').matches
+			: saved === 'true'
+	})
 	const [settings, setSettings] = useState<AppSettings>(() => {
 		const saved = localStorage.getItem('stime-settings-v2')
 		return saved
 			? JSON.parse(saved)
 			: {
-					provider: 'gemini',
-					geminiKey: '',
-					openaiKey: '',
-					anthropicKey: '',
-					model: 'gemini-1.5-pro',
-				}
+				provider: 'gemini',
+				geminiKey: '',
+				openaiKey: '',
+				anthropicKey: '',
+				model: 'gemini-1.5-pro',
+			}
 	})
 
 	const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
@@ -43,6 +49,11 @@ export default function App() {
 		localStorage.setItem('stime-settings-v2', JSON.stringify(settings))
 	}, [settings])
 
+	useEffect(() => {
+		document.documentElement.classList.toggle('dark', darkMode)
+		localStorage.setItem('stime-dark-mode', String(darkMode))
+	}, [darkMode])
+
 	const handleProjectInfoChange = (info: Partial<ProjectInfo>) => {
 		setProjectInfo((prev) => ({ ...prev, ...info }))
 	}
@@ -62,16 +73,18 @@ export default function App() {
 
 	const hasApiKey = Boolean(
 		(settings.provider === 'gemini' && settings.geminiKey) ||
-			(settings.provider === 'openai' && settings.openaiKey) ||
-			(settings.provider === 'anthropic' && settings.anthropicKey),
+		(settings.provider === 'openai' && settings.openaiKey) ||
+		(settings.provider === 'anthropic' && settings.anthropicKey),
 	)
 
 	return (
-		<div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100">
+		<div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100 dark:bg-slate-950 dark:text-slate-100 dark:selection:bg-blue-900">
 			<Header
 				showSettings={showSettings}
 				onToggleSettings={() => setShowSettings(!showSettings)}
 				hasApiKey={hasApiKey}
+				darkMode={darkMode}
+				onToggleDarkMode={() => setDarkMode((current) => !current)}
 			/>
 
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -107,7 +120,7 @@ export default function App() {
 				</div>
 			</main>
 
-			<footer className="mx-auto max-w-7xl px-4 py-12 text-center text-slate-400 text-sm sm:px-6 lg:px-8">
+			<footer className="mx-auto max-w-7xl px-4 py-12 text-center text-slate-400 text-sm sm:px-6 lg:px-8 dark:text-slate-500">
 				<p>© 2026 AI Project Estimator - Powered by Multi-LLM Support</p>
 				<p className="mt-1 italic">
 					Basato sugli standard di complessità aziendali Senior Architect

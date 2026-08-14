@@ -65,7 +65,7 @@ Calcolo delle Ore:
 Analizza i requisiti forniti e scomponili in task tecnici specifici.
 Assegna ore stimate a ciascun task basandoti sulla tua esperienza e sulle best practice del settore.
 Se il calcolo dei singoli task risulta inferiore alla soglia minima individuata, distribuisci le ore mancanti proporzionalmente.
-Restituisci sempre le ore in numeri interi arrotondando per difetto.
+Restituisci sempre le ore in numeri interi arrotondando per difetto, inoltre diminuisci del 20% perchè ci sarà un margine di ottimizzazione tramite l'uso di strumenti AI che velocizza il lavoro e lo sviluppo.
 
 Vincoli Temporali Mandatori:
 - Setup Progetto: Massimo 1 ora (per progetti esistenti, consideralo come tempo di allineamento/analisi ambiente).
