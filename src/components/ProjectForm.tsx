@@ -130,7 +130,7 @@ export const ProjectForm = ({
 
 	return (
 		<div className="sticky top-24 max-h-[calc(100vh-10rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-			<div className="sticky top-0 mb-6 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950">
+			<div className="sticky top-0 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950">
 				<h2 className="font-semibold text-lg text-slate-800 dark:text-slate-100">
 					Dati del progetto
 				</h2>
@@ -142,17 +142,17 @@ export const ProjectForm = ({
 					title="Cancella tutti i dati del progetto"
 				>
 					<Trash2 className="h-4 w-4" />
-					Cancella tutto
+					Reimposta
 				</button>
 			</div>
-			<form onSubmit={onSubmit}>
+			<form onSubmit={onSubmit} className="space-y-6">
 				<TechStackSelector
-					className="p-6"
+					className="mt-4 px-6"
 					selectedTechs={selectedTechs}
 					onToggleTech={onToggleTech}
 				/>
 
-				<div className="grid grid-cols-2 gap-4 p-6">
+				<div className="grid grid-cols-2 gap-4 px-6">
 					<fieldset className="space-y-2">
 						<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
 							Ambito
@@ -214,7 +214,7 @@ export const ProjectForm = ({
 					</fieldset>
 				</div>
 
-				<fieldset className="space-y-2 p-6">
+				<fieldset className="space-y-2 px-6">
 					<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
 						Livello di Esperienza del Team (opzionale)
 					</legend>
@@ -249,7 +249,7 @@ export const ProjectForm = ({
 				</fieldset>
 
 				{/* Percentuali di margine */}
-				<div className="grid grid-cols-3 gap-3 p-6">
+				<div className="grid grid-cols-3 gap-3 px-6">
 					<div>
 						<label
 							htmlFor="testing"
@@ -310,8 +310,8 @@ export const ProjectForm = ({
 				</div>
 
 				{projectInfo.type === 'existing' && (
-					<div className="fade-in slide-in-from-top-2 animate-in p-6">
-						<div className="mb-2 flex items-center justify-between">
+					<div className="fade-in slide-in-from-top-2 animate-in px-6">
+						<div className="flex items-center justify-between space-y-2">
 							<label
 								htmlFor="existingContext"
 								className="block font-medium text-slate-700 text-sm dark:text-slate-300"
@@ -360,8 +360,8 @@ export const ProjectForm = ({
 					</div>
 				)}
 
-				<div className="p-6">
-					<div className="mb-2 flex items-center justify-between">
+				<div className="px-6">
+					<div className="flex items-center justify-between space-y-2">
 						<label
 							htmlFor="requirements"
 							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
@@ -409,8 +409,8 @@ export const ProjectForm = ({
 					/>
 				</div>
 
-				<div className="p-6">
-					<div className="mb-2 flex items-center justify-between">
+				<div className="px-6">
+					<div className="flex items-center justify-between space-y-2">
 						<label
 							htmlFor="notes"
 							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
@@ -507,7 +507,7 @@ export const ProjectForm = ({
 				</div>
 
 				{error && (
-					<div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-6 text-red-600 text-sm dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
+					<div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-6 text-red-600 text-sm dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
 						<span className="h-1.5 w-1.5 rounded-full bg-red-600" />
 						{error}
 					</div>
