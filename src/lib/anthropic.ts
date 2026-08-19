@@ -4,6 +4,10 @@ import { createPrompt } from "./prompt";
 export async function generateEstimateAnthropic(
   techStack: string,
   scope: "Frontend" | "Backend" | "Full-stack",
+  experienceLevel: "beginner" | "experienced",
+  testingPercentage: number,
+  bufferPercentage: number,
+  changeRequestPercentage: number,
   requirements: string,
   notes: string,
   isExistingProject: boolean,
@@ -20,6 +24,10 @@ export async function generateEstimateAnthropic(
   const prompt = createPrompt(
     techStack,
     scope,
+    experienceLevel,
+    testingPercentage,
+    bufferPercentage,
+    changeRequestPercentage,
     requirements,
     notes,
     isExistingProject,

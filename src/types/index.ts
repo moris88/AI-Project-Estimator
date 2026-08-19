@@ -14,6 +14,12 @@ export interface ProjectInfo {
   techStack: string;
   scope: Scope;
   type: ProjectType;
+  experienceLevel: "beginner" | "experienced";
+  percentage: {
+    testing: number;
+    buffer: number;
+    changeRequest: number;
+  };
   requirements: string;
   notes?: string;
   existingContext?: string;

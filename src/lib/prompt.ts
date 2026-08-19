@@ -1,6 +1,10 @@
 export function createPrompt(
   techStack: string,
   scope: "Frontend" | "Backend" | "Full-stack",
+  experienceLevel: "beginner" | "experienced",
+  testingPercentage: number,
+  bufferPercentage: number,
+  changeRequestPercentage: number,
   requirements: string,
   notes: string,
   isExistingProject: boolean,
@@ -62,6 +66,11 @@ Applica rigorosamente una delle seguenti soglie minime (1 giornata = 8h).
   - Complessità Molto Alta: Minimo 50 giornate (400 ore)
   - Complessità Estrema: Minimo 60 giornate (480 ore)
 
+Esperienza del Team:
+- Se il team è composto da sviluppatori con esperienza "beginner", applica un coefficiente di complessità del 20% in più rispetto alle stime standard.
+- Se il team è composto da sviluppatori con esperienza "experienced", applica un coefficiente di complessità del 10% in meno rispetto alle stime standard.
+Attualmente il team è composto da sviluppatori con esperienza "${experienceLevel}".
+
 Calcolo delle Ore:
 Analizza i requisiti forniti e scomponili in task tecnici specifici.
 Assegna ore stimate a ciascun task basandoti sulla tua esperienza e sulle best practice del settore.
@@ -71,9 +80,9 @@ Restituisci sempre le ore in numeri interi arrotondando per difetto, inoltre dim
 Vincoli Temporali Mandatori:
 - Setup Progetto: Massimo 1 ora (per progetti esistenti, consideralo come tempo di allineamento/analisi ambiente).
 - Deploy & Supporto Finale: Massimo 1 ora.
-- Testing: Massimo 20% del totale ore (per progetti esistenti, assicurati che copra i test di regressione).
-- Buffer Imprevisti: Aggiungi un buffer del 20% sul totale ore.
-- Aggiungi un 5% di ore per eventuali richieste di modifica.
+- Testing: Massimo ${testingPercentage}% del totale ore (per progetti esistenti, assicurati che copra i test di regressione).
+- Buffer Imprevisti: Aggiungi un buffer del ${bufferPercentage}% sul totale ore.
+- Aggiungi un ${changeRequestPercentage}% di ore per eventuali richieste di modifica.
 
 Istruzioni di Output:
 Genera DUE SEZIONI distinte, separate da una riga con il testo "---SEPARATOR---".

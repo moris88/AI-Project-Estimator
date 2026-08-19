@@ -10,6 +10,12 @@ const EMPTY_PROJECT_INFO: ProjectInfo = {
 	techStack: '',
 	scope: 'Frontend',
 	type: 'new',
+	experienceLevel: 'beginner',
+	percentage: {
+		testing: 20,
+		buffer: 20,
+		changeRequest: 5,
+	},
 	requirements: '',
 	notes: '',
 	existingContext: '',
@@ -42,7 +48,7 @@ export default function App() {
 		!settings.geminiKey && !settings.openaiKey && !settings.anthropicKey,
 	)
 
-	const { generateEstimate, resetEstimate, loading, result, error } = useEstimate(
+	const { generateEstimate, refineEstimate, resetEstimate, loading, refining, result, error } = useEstimate(
 		settings,
 		projectInfo,
 		selectedTechs,
@@ -98,7 +104,7 @@ export default function App() {
 
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				{showSettings && (
-					<SettingsPanel settings={settings} onSettingsChange={setSettings} />
+					<SettingsPanel isOpen={showSettings} onClose={() => setShowSettings(false)} settings={settings} onSettingsChange={setSettings} />
 				)}
 
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -112,8 +118,6 @@ export default function App() {
 							loading={loading}
 							onReset={handleReset}
 							error={error}
-							provider={settings.provider}
-							model={settings.model}
 						/>
 					</div>
 
@@ -121,10 +125,12 @@ export default function App() {
 						<ResultView
 							result={result}
 							loading={loading}
+							refining={refining}
 							provider={settings.provider}
 							model={settings.model}
 							projectInfo={projectInfo}
 							selectedTechs={selectedTechs}
+							onRefine={refineEstimate}
 						/>
 					</div>
 				</div>

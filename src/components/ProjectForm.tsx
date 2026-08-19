@@ -1,7 +1,11 @@
 import {
+	Award,
+	Clipboard,
 	Code2,
 	Database,
 	FileText,
+	FileUp,
+	GraduationCap,
 	Layout,
 	Loader2,
 	PlusCircle,
@@ -10,7 +14,7 @@ import {
 	Trash2,
 	X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { extractPdfText, MAX_REFERENCE_PDFS } from '../lib/pdf'
 import type { PreviousEstimate, ProjectInfo, Scope } from '../types'
 import { cn } from '../utils/cn'
@@ -24,8 +28,6 @@ interface ProjectFormProps {
 	onSubmit: (e: React.FormEvent) => void
 	loading: boolean
 	error: string | null
-	provider: string
-	model: string
 	onReset: () => void
 }
 
@@ -37,13 +39,16 @@ export const ProjectForm = ({
 	onSubmit,
 	loading,
 	error,
-	provider,
-	model,
 	onReset,
 }: ProjectFormProps) => {
 	const [pdfLoading, setPdfLoading] = useState(false)
 	const [pdfError, setPdfError] = useState<string | null>(null)
 	const previousEstimates = projectInfo.previousEstimates || []
+
+	// Refs per i file input dei singoli textarea
+	const existingContextPdfRef = useRef<HTMLInputElement>(null)
+	const requirementsPdfRef = useRef<HTMLInputElement>(null)
+	const notesPdfRef = useRef<HTMLInputElement>(null)
 
 	const handlePdfChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = Array.from(event.target.files || [])
@@ -83,9 +88,49 @@ export const ProjectForm = ({
 		})
 	}
 
+	// Incolla il testo dagli appunti
+	const handlePasteClipboard = async (fieldKey: keyof ProjectInfo) => {
+		try {
+			const text = await navigator.clipboard.readText()
+			if (text) {
+				const currentValue = (projectInfo[fieldKey] as string) || ''
+				const newValue = currentValue ? `${currentValue}\n${text}` : text
+				onProjectInfoChange({ [fieldKey]: newValue })
+			}
+		} catch (err) {
+			console.error('Impossibile accedere agli appunti:', err)
+		}
+	}
+
+	// Estrae il testo da un PDF e lo incolla nel textarea specificato
+	const handlePastePdfToField = async (
+		fieldKey: keyof ProjectInfo,
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const file = e.target.files?.[0]
+		e.target.value = ''
+		if (!file) return
+
+		setPdfLoading(true)
+		setPdfError(null)
+
+		try {
+			const extractedText = await extractPdfText(file)
+			if (extractedText) {
+				const currentValue = (projectInfo[fieldKey] as string) || ''
+				const newValue = currentValue ? `${currentValue}\n\n${extractedText}` : extractedText
+				onProjectInfoChange({ [fieldKey]: newValue })
+			}
+		} catch (error) {
+			setPdfError(error instanceof Error ? error.message : 'Impossibile leggere il PDF.')
+		} finally {
+			setPdfLoading(false)
+		}
+	}
+
 	return (
-		<div className="sticky top-24 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-			<div className="mb-6 flex items-center justify-between gap-4">
+		<div className="sticky top-24 max-h-[calc(100vh-10rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+			<div className="sticky top-0 mb-6 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950">
 				<h2 className="font-semibold text-lg text-slate-800 dark:text-slate-100">
 					Dati del progetto
 				</h2>
@@ -100,15 +145,14 @@ export const ProjectForm = ({
 					Cancella tutto
 				</button>
 			</div>
-			<form onSubmit={onSubmit} className="space-y-6">
+			<form onSubmit={onSubmit}>
 				<TechStackSelector
+					className="p-6"
 					selectedTechs={selectedTechs}
 					onToggleTech={onToggleTech}
-					provider={provider}
-					model={model}
 				/>
 
-				<div className="grid grid-cols-2 gap-4">
+				<div className="grid grid-cols-2 gap-4 p-6">
 					<fieldset className="space-y-2">
 						<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
 							Ambito
@@ -170,14 +214,138 @@ export const ProjectForm = ({
 					</fieldset>
 				</div>
 
-				{projectInfo.type === 'existing' && (
-					<div className="fade-in slide-in-from-top-2 animate-in">
-						<label
-							htmlFor="existingContext"
-							className="mb-2 block font-medium text-slate-700 text-sm dark:text-slate-300"
+				<fieldset className="space-y-2 p-6">
+					<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
+						Livello di Esperienza del Team (opzionale)
+					</legend>
+					<div className="grid grid-cols-2 gap-2">
+						<button
+							type="button"
+							onClick={() => onProjectInfoChange({ experienceLevel: 'beginner' })}
+							className={cn(
+								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
+								projectInfo.experienceLevel === 'beginner'
+									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+							)}
 						>
-							Stato Attuale / Contesto del Codice
+							<GraduationCap className="h-4 w-4" />
+							Principiante
+						</button>
+						<button
+							type="button"
+							onClick={() => onProjectInfoChange({ experienceLevel: 'experienced' })}
+							className={cn(
+								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
+								projectInfo.experienceLevel === 'experienced'
+									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+							)}
+						>
+							<Award className="h-4 w-4" />
+							Esperto
+						</button>
+					</div>
+				</fieldset>
+
+				{/* Percentuali di margine */}
+				<div className="grid grid-cols-3 gap-3 p-6">
+					<div>
+						<label
+							htmlFor="testing"
+							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+						>
+							Testing (%)
 						</label>
+						<input
+							type="number"
+							id="testing"
+							min={0}
+							max={100}
+							value={projectInfo.percentage?.testing ?? 20}
+							onChange={(e) =>
+								onProjectInfoChange({ percentage: { ...projectInfo.percentage, testing: Number(e.target.value) } })
+							}
+							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+						/>
+					</div>
+					<div>
+						<label
+							htmlFor="buffer"
+							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+						>
+							Imprevisti (%)
+						</label>
+						<input
+							type="number"
+							id="buffer"
+							min={0}
+							max={100}
+							value={projectInfo.percentage?.buffer ?? 20}
+							onChange={(e) =>
+								onProjectInfoChange({ percentage: { ...projectInfo.percentage, buffer: Number(e.target.value) } })
+							}
+							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+						/>
+					</div>
+					<div>
+						<label
+							htmlFor="cr"
+							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+						>
+							Change Request (%)
+						</label>
+						<input
+							type="number"
+							id="cr"
+							min={0}
+							max={100}
+							value={projectInfo.percentage?.changeRequest ?? 5}
+							onChange={(e) =>
+								onProjectInfoChange({ percentage: { ...projectInfo.percentage, changeRequest: Number(e.target.value) } })
+							}
+							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+						/>
+					</div>
+				</div>
+
+				{projectInfo.type === 'existing' && (
+					<div className="fade-in slide-in-from-top-2 animate-in p-6">
+						<div className="mb-2 flex items-center justify-between">
+							<label
+								htmlFor="existingContext"
+								className="block font-medium text-slate-700 text-sm dark:text-slate-300"
+							>
+								Stato Attuale / Contesto del Codice
+							</label>
+							<div className="flex gap-1.5">
+								<button
+									type="button"
+									onClick={() => handlePasteClipboard('existingContext')}
+									className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+									title="Incolla dagli appunti"
+								>
+									<Clipboard className="h-3 w-3" />
+									Incolla
+								</button>
+								<button
+									type="button"
+									onClick={() => existingContextPdfRef.current?.click()}
+									className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+									title="Incolla testo estraendolo da un PDF"
+								>
+									<FileUp className="h-3 w-3" />
+									Incolla da PDF
+								</button>
+								<input
+									ref={existingContextPdfRef}
+									type="file"
+									accept="application/pdf,.pdf"
+									className="hidden"
+									onChange={(e) => handlePastePdfToField('existingContext', e)}
+								/>
+							</div>
+						</div>
 						<textarea
 							id="existingContext"
 							required
@@ -192,13 +360,42 @@ export const ProjectForm = ({
 					</div>
 				)}
 
-				<div>
-					<label
-						htmlFor="requirements"
-						className="mb-2 block font-medium text-slate-700 text-sm dark:text-slate-300"
-					>
-						Nuove Funzionalità / Requisiti
-					</label>
+				<div className="p-6">
+					<div className="mb-2 flex items-center justify-between">
+						<label
+							htmlFor="requirements"
+							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
+						>
+							Nuove Funzionalità / Requisiti
+						</label>
+						<div className="flex gap-1.5">
+							<button
+								type="button"
+								onClick={() => handlePasteClipboard('requirements')}
+								className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+								title="Incolla dagli appunti"
+							>
+								<Clipboard className="h-3 w-3" />
+								Incolla
+							</button>
+							<button
+								type="button"
+								onClick={() => requirementsPdfRef.current?.click()}
+								className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+								title="Incolla testo estraendolo da un PDF"
+							>
+								<FileUp className="h-3 w-3" />
+								Incolla da PDF
+							</button>
+							<input
+								ref={requirementsPdfRef}
+								type="file"
+								accept="application/pdf,.pdf"
+								className="hidden"
+								onChange={(e) => handlePastePdfToField('requirements', e)}
+							/>
+						</div>
+					</div>
 					<textarea
 						id="requirements"
 						required
@@ -212,13 +409,42 @@ export const ProjectForm = ({
 					/>
 				</div>
 
-				<div>
-					<label
-						htmlFor="notes"
-						className="mb-2 block font-medium text-slate-700 text-sm dark:text-slate-300"
-					>
-						Note Aggiuntive (opzionale)
-					</label>
+				<div className="p-6">
+					<div className="mb-2 flex items-center justify-between">
+						<label
+							htmlFor="notes"
+							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
+						>
+							Note Aggiuntive (opzionale)
+						</label>
+						<div className="flex gap-1.5">
+							<button
+								type="button"
+								onClick={() => handlePasteClipboard('notes')}
+								className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+								title="Incolla dagli appunti"
+							>
+								<Clipboard className="h-3 w-3" />
+								Incolla
+							</button>
+							<button
+								type="button"
+								onClick={() => notesPdfRef.current?.click()}
+								className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+								title="Incolla testo estraendolo da un PDF"
+							>
+								<FileUp className="h-3 w-3" />
+								Incolla da PDF
+							</button>
+							<input
+								ref={notesPdfRef}
+								type="file"
+								accept="application/pdf,.pdf"
+								className="hidden"
+								onChange={(e) => handlePastePdfToField('notes', e)}
+							/>
+						</div>
+					</div>
 					<textarea
 						id="notes"
 						value={projectInfo.notes || ''}
@@ -281,12 +507,13 @@ export const ProjectForm = ({
 				</div>
 
 				{error && (
-					<div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-3 text-red-600 text-sm dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
+					<div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-6 text-red-600 text-sm dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
 						<span className="h-1.5 w-1.5 rounded-full bg-red-600" />
 						{error}
 					</div>
 				)}
 
+				<div className="sticky bottom-0 flex w-full items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
 				<button
 					type="submit"
 					disabled={loading}
@@ -309,6 +536,7 @@ export const ProjectForm = ({
 						</>
 					)}
 				</button>
+				</div>
 			</form>
 		</div>
 	)

@@ -10,6 +10,7 @@ export const useEstimate = (
   selectedTechs: string[],
 ) => {
   const [loading, setLoading] = useState(false);
+  const [refining, setRefining] = useState(false);
   const [result, setResult] = useState<EstimationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +44,10 @@ export const useEstimate = (
       const commonParams = [
         selectedTechs.join(", "),
         projectInfo.scope,
+        projectInfo.experienceLevel,
+        projectInfo.percentage.testing,
+        projectInfo.percentage.buffer,
+        projectInfo.percentage.changeRequest,
         projectInfo.requirements,
         projectInfo.notes || "",
         projectInfo.type === "existing",
@@ -71,10 +76,74 @@ export const useEstimate = (
     }
   };
 
+  const refineEstimate = async (refinementPrompt: string) => {
+    const apiKey = getCurrentKey();
+    if (!apiKey || !result) return;
+
+    setRefining(true);
+    setError(null);
+
+    try {
+      // Costruiamo un prompt arricchito includendo la stima precedente e le istruzioni di modifica
+      const refinedRequirements = `
+STIMA ATTUALE DA MODIFICARE:
+${result.stima}
+${result.sprints ? `\n--- SPRINT ATTUALI ---\n${result.sprints}` : ""}
+
+ISTRUZIONI DI MODIFICA DALL'UTENTE:
+"${refinementPrompt}"
+
+Per favore, rigenera la stima mantenendo la struttura e il formato precedente, applicando accuratamente le modifiche o ricalcolando le ore e i costi richiesti.
+`.trim();
+
+      let fullText = "";
+      const commonParams = [
+        selectedTechs.join(", "),
+        projectInfo.scope,
+        projectInfo.experienceLevel,
+        projectInfo.percentage.testing,
+        projectInfo.percentage.buffer,
+        projectInfo.percentage.changeRequest,
+        refinedRequirements,
+        projectInfo.notes || "",
+        projectInfo.type === "existing",
+        projectInfo.existingContext || "",
+        (projectInfo.previousEstimates || [])
+          .map((estimate) => `--- ${estimate.name} ---\n${estimate.text}`)
+          .join("\n\n"),
+        apiKey,
+        settings.model,
+      ] as const;
+
+      if (settings.provider === "gemini") {
+        fullText = await generateEstimateGemini(...commonParams);
+      } else if (settings.provider === "openai") {
+        fullText = await generateEstimateOpenAI(...commonParams);
+      } else if (settings.provider === "anthropic") {
+        fullText = await generateEstimateAnthropic(...commonParams);
+      }
+
+      const [stima, sprints] = fullText.split("---SEPARATOR---");
+      setResult({ stima: stima || fullText, sprints: sprints || "" });
+    } catch (err: any) {
+      setError(err.message || "Errore durante l'aggiornamento della stima");
+    } finally {
+      setRefining(false);
+    }
+  };
+
   const resetEstimate = () => {
     setResult(null);
     setError(null);
   };
 
-  return { generateEstimate, resetEstimate, loading, result, error };
+  return {
+    generateEstimate,
+    refineEstimate,
+    resetEstimate,
+    loading,
+    refining,
+    result,
+    error,
+  };
 };
