@@ -38,7 +38,7 @@ export default function App() {
 				geminiKey: '',
 				openaiKey: '',
 				anthropicKey: '',
-				model: 'gemini-1.5-pro',
+				model: 'gemini-3.1-fresh-lite',
 			}
 	})
 
