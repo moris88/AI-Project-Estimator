@@ -24,7 +24,7 @@ export const Header = ({
 						<Database className="h-5 w-5 text-white" />
 					</div>
 					<h1 className="font-bold text-xl tracking-tight">
-						AI Project Estimator
+						AI Project Estimator (⚠️ Beta version)
 					</h1>
 				</div>
 				<div className="flex items-center gap-1">
