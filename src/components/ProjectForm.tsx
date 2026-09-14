@@ -50,7 +50,9 @@ export const ProjectForm = ({
 	const requirementsPdfRef = useRef<HTMLInputElement>(null)
 	const notesPdfRef = useRef<HTMLInputElement>(null)
 
-	const handlePdfChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handlePdfChange = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
 		const files = Array.from(event.target.files || [])
 		const availableSlots = MAX_REFERENCE_PDFS - previousEstimates.length
 
@@ -69,14 +71,20 @@ export const ProjectForm = ({
 		setPdfLoading(true)
 		try {
 			const extracted = await Promise.all(
-				files.slice(0, availableSlots).map(async (file): Promise<PreviousEstimate> => ({
-					name: file.name,
-					text: await extractPdfText(file),
-				})),
+				files.slice(0, availableSlots).map(
+					async (file): Promise<PreviousEstimate> => ({
+						name: file.name,
+						text: await extractPdfText(file),
+					}),
+				),
 			)
-			onProjectInfoChange({ previousEstimates: [...previousEstimates, ...extracted] })
+			onProjectInfoChange({
+				previousEstimates: [...previousEstimates, ...extracted],
+			})
 		} catch (error) {
-			setPdfError(error instanceof Error ? error.message : 'Impossibile leggere il PDF.')
+			setPdfError(
+				error instanceof Error ? error.message : 'Impossibile leggere il PDF.',
+			)
 		} finally {
 			setPdfLoading(false)
 		}
@@ -84,7 +92,9 @@ export const ProjectForm = ({
 
 	const handleRemovePdf = (estimateToRemove: PreviousEstimate) => {
 		onProjectInfoChange({
-			previousEstimates: previousEstimates.filter((estimate) => estimate !== estimateToRemove),
+			previousEstimates: previousEstimates.filter(
+				(estimate) => estimate !== estimateToRemove,
+			),
 		})
 	}
 
@@ -105,7 +115,7 @@ export const ProjectForm = ({
 	// Estrae il testo da un PDF e lo incolla nel textarea specificato
 	const handlePastePdfToField = async (
 		fieldKey: keyof ProjectInfo,
-		e: React.ChangeEvent<HTMLInputElement>
+		e: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		const file = e.target.files?.[0]
 		e.target.value = ''
@@ -118,11 +128,15 @@ export const ProjectForm = ({
 			const extractedText = await extractPdfText(file)
 			if (extractedText) {
 				const currentValue = (projectInfo[fieldKey] as string) || ''
-				const newValue = currentValue ? `${currentValue}\n\n${extractedText}` : extractedText
+				const newValue = currentValue
+					? `${currentValue}\n\n${extractedText}`
+					: extractedText
 				onProjectInfoChange({ [fieldKey]: newValue })
 			}
 		} catch (error) {
-			setPdfError(error instanceof Error ? error.message : 'Impossibile leggere il PDF.')
+			setPdfError(
+				error instanceof Error ? error.message : 'Impossibile leggere il PDF.',
+			)
 		} finally {
 			setPdfLoading(false)
 		}
@@ -130,7 +144,7 @@ export const ProjectForm = ({
 
 	return (
 		<div className="sticky top-24 max-h-[calc(100vh-10rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-			<div className="sticky top-0 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950 z-50">
+			<div className="sticky top-0 z-50 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950">
 				<h2 className="font-semibold text-lg text-slate-800 dark:text-slate-100">
 					Dati del progetto
 				</h2>
@@ -158,8 +172,9 @@ export const ProjectForm = ({
 							Ambito
 						</legend>
 						<p className="text-slate-500 text-xs dark:text-slate-400">
-							Scegli quale parte dell’app deve essere realizzata: <strong>Frontend</strong> è ciò che
-							l’utente vede e usa, <strong>Backend</strong> è ciò che lavora dietro le quinte e{' '}
+							Scegli quale parte dell’app deve essere realizzata:{' '}
+							<strong>Frontend</strong> è ciò che l’utente vede e usa,{' '}
+							<strong>Backend</strong> è ciò che lavora dietro le quinte e{' '}
 							<strong>Full-stack</strong> comprende entrambe.
 						</p>
 						<div className="grid grid-cols-1 gap-2">
@@ -189,7 +204,8 @@ export const ProjectForm = ({
 							Tipo Progetto
 						</legend>
 						<p className="text-slate-500 text-xs dark:text-slate-400">
-							Scegli se si parte da zero o se si interviene su un’applicazione già esistente.
+							Scegli se si parte da zero o se si interviene su un’applicazione
+							già esistente.
 						</p>
 						<div className="grid grid-cols-1 gap-2">
 							<button
@@ -227,14 +243,17 @@ export const ProjectForm = ({
 						Livello di Esperienza del Team
 					</legend>
 					<p className="text-slate-500 text-xs dark:text-slate-400">
-						Indica quanto il team conosce già gli strumenti scelti per questo progetto. Considera la
-						familiarità media delle persone che lavoreranno al progetto, non solo gli anni di
-						esperienza complessivi.
+						Indica quanto il team conosce già gli strumenti scelti per questo
+						progetto. Considera la familiarità media delle persone che
+						lavoreranno al progetto, non solo gli anni di esperienza
+						complessivi.
 					</p>
 					<div className="grid grid-cols-2 gap-2">
 						<button
 							type="button"
-							onClick={() => onProjectInfoChange({ experienceLevel: 'beginner' })}
+							onClick={() =>
+								onProjectInfoChange({ experienceLevel: 'beginner' })
+							}
 							className={cn(
 								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
 								projectInfo.experienceLevel === 'beginner'
@@ -247,7 +266,9 @@ export const ProjectForm = ({
 						</button>
 						<button
 							type="button"
-							onClick={() => onProjectInfoChange({ experienceLevel: 'experienced' })}
+							onClick={() =>
+								onProjectInfoChange({ experienceLevel: 'experienced' })
+							}
 							className={cn(
 								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
 								projectInfo.experienceLevel === 'experienced'
@@ -261,14 +282,20 @@ export const ProjectForm = ({
 					</div>
 					<div className="space-y-1 text-slate-500 text-xs dark:text-slate-400">
 						<p>
-							<strong className="font-medium text-slate-600 dark:text-slate-300">Principiante:</strong>{' '}
-							il team ha poca esperienza con gli strumenti scelti o con lavori simili. La stima
-							considera circa il 20% di tempo in più per imparare e gestire gli imprevisti.
+							<strong className="font-medium text-slate-600 dark:text-slate-300">
+								Principiante:
+							</strong>{' '}
+							il team ha poca esperienza con gli strumenti scelti o con lavori
+							simili. La stima considera circa il 20% di tempo in più per
+							imparare e gestire gli imprevisti.
 						</p>
 						<p>
-							<strong className="font-medium text-slate-600 dark:text-slate-300">Esperto:</strong>{' '}
-							il team ha già svolto lavori simili e sa usare gli strumenti scelti in autonomia. La
-							stima considera circa il 10% di tempo in meno.
+							<strong className="font-medium text-slate-600 dark:text-slate-300">
+								Esperto:
+							</strong>{' '}
+							il team ha già svolto lavori simili e sa usare gli strumenti
+							scelti in autonomia. La stima considera circa il 10% di tempo in
+							meno.
 						</p>
 					</div>
 				</fieldset>
@@ -277,8 +304,9 @@ export const ProjectForm = ({
 				<div className="grid grid-cols-3 gap-3 px-6">
 					<div className="col-span-3">
 						<p className="text-slate-500 text-xs dark:text-slate-400">
-							Aggiungi del tempo extra alla stima per tenere conto dei controlli, dei problemi
-							imprevisti e dei possibili cambiamenti durante il progetto.
+							Aggiungi del tempo extra alla stima per tenere conto dei
+							controlli, dei problemi imprevisti e dei possibili cambiamenti
+							durante il progetto.
 						</p>
 					</div>
 					<div className="flex flex-col">
@@ -288,7 +316,9 @@ export const ProjectForm = ({
 						>
 							Testing (%)
 						</label>
-						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per controllare che tutto funzioni.</p>
+						<p className="mb-1 min-h-8 text-[11px] text-slate-500 dark:text-slate-400">
+							Tempo per controllare che tutto funzioni.
+						</p>
 						<input
 							type="number"
 							id="testing"
@@ -296,7 +326,12 @@ export const ProjectForm = ({
 							max={100}
 							value={projectInfo.percentage?.testing ?? 5}
 							onChange={(e) =>
-								onProjectInfoChange({ percentage: { ...projectInfo.percentage, testing: Number(e.target.value) } })
+								onProjectInfoChange({
+									percentage: {
+										...projectInfo.percentage,
+										testing: Number(e.target.value),
+									},
+								})
 							}
 							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 						/>
@@ -308,7 +343,9 @@ export const ProjectForm = ({
 						>
 							Imprevisti (%)
 						</label>
-						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per problemi o attività impreviste.</p>
+						<p className="mb-1 min-h-8 text-[11px] text-slate-500 dark:text-slate-400">
+							Tempo per problemi o attività impreviste.
+						</p>
 						<input
 							type="number"
 							id="buffer"
@@ -316,7 +353,12 @@ export const ProjectForm = ({
 							max={100}
 							value={projectInfo.percentage?.buffer ?? 10}
 							onChange={(e) =>
-								onProjectInfoChange({ percentage: { ...projectInfo.percentage, buffer: Number(e.target.value) } })
+								onProjectInfoChange({
+									percentage: {
+										...projectInfo.percentage,
+										buffer: Number(e.target.value),
+									},
+								})
 							}
 							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 						/>
@@ -328,7 +370,9 @@ export const ProjectForm = ({
 						>
 							Change Request (%)
 						</label>
-						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per cambiamenti richiesti in seguito.</p>
+						<p className="mb-1 min-h-8 text-[11px] text-slate-500 dark:text-slate-400">
+							Tempo per cambiamenti richiesti in seguito.
+						</p>
 						<input
 							type="number"
 							id="cr"
@@ -336,7 +380,12 @@ export const ProjectForm = ({
 							max={100}
 							value={projectInfo.percentage?.changeRequest ?? 5}
 							onChange={(e) =>
-								onProjectInfoChange({ percentage: { ...projectInfo.percentage, changeRequest: Number(e.target.value) } })
+								onProjectInfoChange({
+									percentage: {
+										...projectInfo.percentage,
+										changeRequest: Number(e.target.value),
+									},
+								})
 							}
 							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 						/>
@@ -381,8 +430,8 @@ export const ProjectForm = ({
 							</div>
 						</div>
 						<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
-							Spiega com’è fatta oggi l’app, cosa funziona già e quali parti potrebbero richiedere
-							lavoro prima delle modifiche.
+							Spiega com’è fatta oggi l’app, cosa funziona già e quali parti
+							potrebbero richiedere lavoro prima delle modifiche.
 						</p>
 						<textarea
 							id="existingContext"
@@ -404,7 +453,8 @@ export const ProjectForm = ({
 							htmlFor="requirements"
 							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
 						>
-							Nuove Funzionalità / Requisiti <span className="font-normal text-red-500">(obbligatorio)</span>
+							Nuove Funzionalità / Requisiti{' '}
+							<span className="font-normal text-red-500">(obbligatorio)</span>
 						</label>
 						<div className="flex gap-1.5">
 							<button
@@ -435,8 +485,8 @@ export const ProjectForm = ({
 						</div>
 					</div>
 					<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
-						Scrivi cosa vuoi ottenere, chi userà la funzione e quali regole deve rispettare. Più
-						informazioni fornisci, più la stima sarà precisa.
+						Scrivi cosa vuoi ottenere, chi userà la funzione e quali regole deve
+						rispettare. Più informazioni fornisci, più la stima sarà precisa.
 					</p>
 					<textarea
 						id="requirements"
@@ -489,8 +539,8 @@ export const ProjectForm = ({
 						</div>
 					</div>
 					<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
-						Aggiungi regole o richieste particolari, ad esempio sicurezza, velocità, scadenze o
-						informazioni utili che non hai inserito sopra.
+						Aggiungi regole o richieste particolari, ad esempio sicurezza,
+						velocità, scadenze o informazioni utili che non hai inserito sopra.
 					</p>
 					<textarea
 						id="notes"
@@ -509,25 +559,29 @@ export const ProjectForm = ({
 							Stime precedenti in PDF (opzionale)
 						</label>
 						<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
-							Allega stime già approvate o progetti comparabili per fornire all’AI un riferimento
-							storico. Il contenuto viene usato solo come contesto.
+							Allega stime già approvate o progetti comparabili per fornire
+							all’AI un riferimento storico. Il contenuto viene usato solo come
+							contesto.
 						</p>
 						<input
 							id="previous-estimates"
 							type="file"
 							accept="application/pdf,.pdf"
 							multiple
-							disabled={pdfLoading || previousEstimates.length >= MAX_REFERENCE_PDFS}
+							disabled={
+								pdfLoading || previousEstimates.length >= MAX_REFERENCE_PDFS
+							}
 							onChange={handlePdfChange}
 							className="block w-full cursor-pointer rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-sm file:mr-4 file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:font-medium file:text-white hover:file:bg-blue-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
 						/>
 						<p className="mt-1 text-slate-400 text-xs">
-							Puoi allegare fino a {MAX_REFERENCE_PDFS} PDF con stime precedenti o progetti simili.
-							Il contenuto verrà usato come riferimento.
+							Puoi allegare fino a {MAX_REFERENCE_PDFS} PDF con stime precedenti
+							o progetti simili. Il contenuto verrà usato come riferimento.
 						</p>
 						{pdfLoading && (
 							<p className="mt-2 flex items-center gap-2 text-blue-600 text-xs">
-								<Loader2 className="h-3 w-3 animate-spin" /> Lettura dei PDF in corso...
+								<Loader2 className="h-3 w-3 animate-spin" /> Lettura dei PDF in
+								corso...
 							</p>
 						)}
 						{previousEstimates.length > 0 && (
@@ -554,7 +608,11 @@ export const ProjectForm = ({
 								))}
 							</div>
 						)}
-						{pdfError && <p className="mt-2 text-red-600 text-xs dark:text-red-300">{pdfError}</p>}
+						{pdfError && (
+							<p className="mt-2 text-red-600 text-xs dark:text-red-300">
+								{pdfError}
+							</p>
+						)}
 					</div>
 				</div>
 

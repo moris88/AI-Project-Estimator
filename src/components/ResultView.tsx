@@ -10,8 +10,8 @@ import {
 	Sparkles,
 } from 'lucide-react'
 import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
+import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { EstimationResult, ProjectInfo } from '../types'
 import { EstimatePDF } from './EstimatePDF'
@@ -34,7 +34,7 @@ const markdownComponents: Components = {
 		</h1>
 	),
 	h2: ({ children }) => (
-		<h2 className="mt-10 mb-4 border-blue-200 border-l-4 pl-3 font-bold text-xl text-slate-800 dark:border-blue-800 dark:text-slate-100">
+		<h2 className="mt-10 mb-4 border-blue-200 border-l-4 pl-3 font-bold text-slate-800 text-xl dark:border-blue-800 dark:text-slate-100">
 			{children}
 		</h2>
 	),
@@ -44,19 +44,37 @@ const markdownComponents: Components = {
 		</h3>
 	),
 	p: ({ children }) => (
-		<p className="my-5 leading-7 text-slate-700 dark:text-slate-300">{children}</p>
+		<p className="my-5 text-slate-700 leading-7 dark:text-slate-300">
+			{children}
+		</p>
 	),
-	ul: ({ children }) => <ul className="my-5 list-disc space-y-2 pl-6">{children}</ul>,
-	ol: ({ children }) => <ol className="my-5 list-decimal space-y-2 pl-6">{children}</ol>,
+	ul: ({ children }) => (
+		<ul className="my-5 list-disc space-y-2 pl-6">{children}</ul>
+	),
+	ol: ({ children }) => (
+		<ol className="my-5 list-decimal space-y-2 pl-6">{children}</ol>
+	),
 	li: ({ children }) => <li className="pl-1 leading-7">{children}</li>,
-	strong: ({ children }) => <strong className="font-bold text-slate-900 dark:text-slate-100">{children}</strong>,
+	strong: ({ children }) => (
+		<strong className="font-bold text-slate-900 dark:text-slate-100">
+			{children}
+		</strong>
+	),
 	table: ({ children }) => (
 		<div className="my-7 w-full overflow-x-auto rounded-lg border border-slate-300 dark:border-slate-600">
-			<table className="w-full min-w-160 border-collapse text-left text-sm">{children}</table>
+			<table className="w-full min-w-160 border-collapse text-left text-sm">
+				{children}
+			</table>
 		</div>
 	),
-	thead: ({ children }) => <thead className="bg-slate-100 dark:bg-slate-800">{children}</thead>,
-	tbody: ({ children }) => <tbody className="divide-y divide-slate-200 dark:divide-slate-700">{children}</tbody>,
+	thead: ({ children }) => (
+		<thead className="bg-slate-100 dark:bg-slate-800">{children}</thead>
+	),
+	tbody: ({ children }) => (
+		<tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+			{children}
+		</tbody>
+	),
 	th: ({ children }) => (
 		<th className="border-slate-300 border-r px-4 py-3 font-semibold text-slate-800 last:border-r-0 dark:border-slate-600 dark:text-slate-100">
 			{children}
@@ -82,16 +100,26 @@ export const ResultView = ({
 	const [refinePrompt, setRefinePrompt] = useState('')
 	const [downloadOpen, setDownloadOpen] = useState(false)
 	const [downloadName, setDownloadName] = useState('stima_progetto')
-	const [downloadFormat, setDownloadFormat] = useState<'pdf' | 'markdown'>('pdf')
-	const [openSections, setOpenSections] = useState({ estimate: true, sprints: true })
+	const [downloadFormat, setDownloadFormat] = useState<'pdf' | 'markdown'>(
+		'pdf',
+	)
+	const [openSections, setOpenSections] = useState({
+		estimate: true,
+		sprints: true,
+	})
 
 	const estimateContent = result
 		? `${result.stima}${result.sprints ? `\n\n${result.sprints}` : ''}`
 		: ''
-	const fileBaseName = (downloadName.trim() || 'stima_progetto').replace(/\.(pdf|md)$/i, '')
+	const fileBaseName = (downloadName.trim() || 'stima_progetto').replace(
+		/\.(pdf|md)$/i,
+		'',
+	)
 
 	const handleMarkdownDownload = () => {
-		const blob = new Blob([estimateContent], { type: 'text/markdown;charset=utf-8' })
+		const blob = new Blob([estimateContent], {
+			type: 'text/markdown;charset=utf-8',
+		})
 		const url = URL.createObjectURL(blob)
 		const link = document.createElement('a')
 		link.href = url
@@ -166,7 +194,10 @@ export const ResultView = ({
 							</button>
 							{downloadOpen && (
 								<div className="absolute top-full right-0 z-10 mt-2 w-72 rounded-lg border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-900">
-									<label htmlFor="download-name" className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300">
+									<label
+										htmlFor="download-name"
+										className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+									>
 										Nome del file
 									</label>
 									<input
@@ -177,13 +208,18 @@ export const ResultView = ({
 										placeholder="Es: stima_sito_e-commerce"
 										className="mb-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
 									/>
-									<label htmlFor="download-format" className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300">
+									<label
+										htmlFor="download-format"
+										className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+									>
 										Formato
 									</label>
 									<select
 										id="download-format"
 										value={downloadFormat}
-										onChange={(e) => setDownloadFormat(e.target.value as 'pdf' | 'markdown')}
+										onChange={(e) =>
+											setDownloadFormat(e.target.value as 'pdf' | 'markdown')
+										}
 										className="mb-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 									>
 										<option value="pdf">PDF</option>
@@ -206,7 +242,9 @@ export const ResultView = ({
 											fileName={`${fileBaseName}.pdf`}
 											className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-3 py-2 font-medium text-sm text-white hover:bg-blue-700"
 										>
-											{({ loading: pdfLoading }) => (pdfLoading ? 'Preparazione PDF...' : 'Scarica PDF')}
+											{({ loading: pdfLoading }) =>
+												pdfLoading ? 'Preparazione PDF...' : 'Scarica PDF'
+											}
 										</PDFDownloadLink>
 									) : (
 										<button
@@ -239,65 +277,94 @@ export const ResultView = ({
 								<span className="block font-medium text-slate-400 text-xs uppercase tracking-wide dark:text-slate-500">
 									Sezione 1
 								</span>
-								<span className="block truncate font-semibold text-slate-800 text-base dark:text-slate-100">
+								<span className="block truncate font-semibold text-base text-slate-800 dark:text-slate-100">
 									Stima del progetto
 								</span>
 							</span>
 						</span>
-						<ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:text-blue-600 ${openSections.estimate ? 'rotate-180' : ''}`} />
+						<ChevronDown
+							className={`h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:text-blue-600 ${openSections.estimate ? 'rotate-180' : ''}`}
+						/>
 					</button>
 					{openSections.estimate && (
-						<div id="estimate-section" className="max-w-none border-slate-200 border-t px-6 py-6 dark:border-slate-800">
-							<ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{result.stima}</ReactMarkdown>
+						<div
+							id="estimate-section"
+							className="max-w-none border-slate-200 border-t px-6 py-6 dark:border-slate-800"
+						>
+							<ReactMarkdown
+								components={markdownComponents}
+								remarkPlugins={[remarkGfm]}
+							>
+								{result.stima}
+							</ReactMarkdown>
 						</div>
 					)}
 				</div>
 
 				{result.sprints && (
 					<>
-						<div className="not-prose flex items-center gap-3 px-2 py-3" aria-hidden="true">
+						<div
+							className="not-prose flex items-center gap-3 px-2 py-3"
+							aria-hidden="true"
+						>
 							<div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-							<span className="font-medium text-slate-400 text-[11px] uppercase tracking-widest dark:text-slate-500">
+							<span className="font-medium text-[11px] text-slate-400 uppercase tracking-widest dark:text-slate-500">
 								Pianificazione
 							</span>
 							<div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
 						</div>
 						<div className="not-prose overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-						<button
-							type="button"
-							onClick={() => toggleSection('sprints')}
-							className="group flex w-full cursor-pointer items-center justify-between gap-4 bg-slate-50 px-5 py-4 text-left transition-colors hover:bg-emerald-50/70 dark:bg-slate-950 dark:hover:bg-emerald-950/30"
-							aria-expanded={openSections.sprints}
-							aria-controls="sprints-section"
-						>
-							<span className="flex min-w-0 items-center gap-3">
-								<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">
-									<ListChecks className="h-5 w-5" />
-								</span>
-								<span className="min-w-0">
-									<span className="block font-medium text-slate-400 text-xs uppercase tracking-wide dark:text-slate-500">
-										Sezione 2
+							<button
+								type="button"
+								onClick={() => toggleSection('sprints')}
+								className="group flex w-full cursor-pointer items-center justify-between gap-4 bg-slate-50 px-5 py-4 text-left transition-colors hover:bg-emerald-50/70 dark:bg-slate-950 dark:hover:bg-emerald-950/30"
+								aria-expanded={openSections.sprints}
+								aria-controls="sprints-section"
+							>
+								<span className="flex min-w-0 items-center gap-3">
+									<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">
+										<ListChecks className="h-5 w-5" />
 									</span>
-									<span className="block truncate font-semibold text-slate-800 text-base dark:text-slate-100">
-										Pianificazione settimanale
+									<span className="min-w-0">
+										<span className="block font-medium text-slate-400 text-xs uppercase tracking-wide dark:text-slate-500">
+											Sezione 2
+										</span>
+										<span className="block truncate font-semibold text-base text-slate-800 dark:text-slate-100">
+											Pianificazione settimanale
+										</span>
 									</span>
 								</span>
-							</span>
-							<ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:text-emerald-600 ${openSections.sprints ? 'rotate-180' : ''}`} />
-						</button>
-						{openSections.sprints && (
-							<div id="sprints-section" className="max-w-none border-slate-200 border-t px-6 py-6 dark:border-slate-800">
-								<ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{result.sprints}</ReactMarkdown>
-							</div>
-						)}
+								<ChevronDown
+									className={`h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:text-emerald-600 ${openSections.sprints ? 'rotate-180' : ''}`}
+								/>
+							</button>
+							{openSections.sprints && (
+								<div
+									id="sprints-section"
+									className="max-w-none border-slate-200 border-t px-6 py-6 dark:border-slate-800"
+								>
+									<ReactMarkdown
+										components={markdownComponents}
+										remarkPlugins={[remarkGfm]}
+									>
+										{result.sprints}
+									</ReactMarkdown>
+								</div>
+							)}
 						</div>
 					</>
 				)}
 
 				{/* Box per Affinare/Modificare la Stima al Volo */}
 				<div className="not-prose mt-12 border-slate-200 border-t pt-8 dark:border-slate-800">
-					<form onSubmit={handleRefineSubmit} className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/40 dark:bg-slate-800/50">
-						<label htmlFor="refinePrompt" className="flex items-center gap-2 font-semibold text-slate-800 text-sm dark:text-slate-200">
+					<form
+						onSubmit={handleRefineSubmit}
+						className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/40 dark:bg-slate-800/50"
+					>
+						<label
+							htmlFor="refinePrompt"
+							className="flex items-center gap-2 font-semibold text-slate-800 text-sm dark:text-slate-200"
+						>
 							<Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 							Modifica o affina la stima al volo
 						</label>
@@ -332,7 +399,8 @@ export const ResultView = ({
 							</div>
 						</div>
 						<p className="text-slate-500 text-xs dark:text-slate-400">
-							Chiedi all'AI di rimodulare ore, aggiungere/rimuovere task o ricalcolare i costi in base ai nuovi vincoli.
+							Chiedi all'AI di rimodulare ore, aggiungere/rimuovere task o
+							ricalcolare i costi in base ai nuovi vincoli.
 						</p>
 					</form>
 				</div>

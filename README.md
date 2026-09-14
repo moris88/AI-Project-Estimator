@@ -40,13 +40,25 @@ Assicurati di avere [Node.js](https://nodejs.org/) installato.
    # oppure npm install / yarn install
    ```
 
-3. Avvia l'applicazione in modalità sviluppo:
+3. Avvia l'applicazione desktop in modalità sviluppo:
 
    ```bash
    pnpm dev
    ```
 
-4. Apri il browser all'indirizzo `http://localhost:3000`.
+   Per avviare soltanto la versione web nel browser usa `pnpm dev:web` e apri `http://localhost:3000`.
+
+## Distribuzione desktop
+
+Genera gli artefatti nella cartella `dist`:
+
+```bash
+pnpm build:win       # archivio ZIP per Windows x64
+pnpm build:linux     # archivio ZIP per Linux x64
+pnpm build:electron  # entrambi i pacchetti
+```
+
+Per impostare un'icona personalizzata, sostituisci l'asset in `resources` con un PNG di almeno 256x256 pixel e aggiungi il relativo percorso alla configurazione `build` in `package.json`.
 
 ## ⚙️ Configurazione
 

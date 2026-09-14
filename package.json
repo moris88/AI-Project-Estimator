@@ -1,17 +1,49 @@
 {
-  "name": "client",
+  "name": "ai-project-estimator",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "out/main/main.js",
   "license": "MIT",
-  "author": "Maurizio Tolomeo",
+  "author": {
+    "name": "Maurizio Tolomeo",
+    "email": "mauriziotolomeo@outlook.it",
+    "url": "https://mauriziotolomeo.it"
+  },
+  "desktopName": "AI-Project-Estimator",
+  "description": "AI Project Estimator Application",
+  "build": {
+    "appId": "com.ai-project-estimator.app",
+    "productName": "AI-Project-Estimator",
+    "linux": {
+      "category": "Utility",
+      "target": [
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "zip"
+      ]
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
   "scripts": {
-    "dev": "vite --host --port 3000",
+    "lint": "biome check ./src",
+    "dev": "node --env-file=.env scripts/start.js",
+    "dev:web": "vite --host --port 3000",
+    "dev:electron": "electron-vite dev",
+    "preview": "vite preview",
+    "preview:electron": "electron-vite preview",
     "build": "tsc -b && vite build",
-    "lint": "biome lint ./src",
-    "format": "biome format --write ./src",
-    "check": "biome check ./src",
-    "preview": "vite preview"
+    "build:electron": "pnpm clean && electron-vite build && electron-builder --win --linux --publish=never",
+    "clean": "rimraf dist out"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -36,8 +68,12 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.5.0",
+    "electron": "^43.7.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
     "globals": "^17.6.0",
     "postcss": "^8.5.26",
+    "rimraf": "^6.1.3",
     "tailwindcss": "^4.3.1",
     "typescript": "~6.0.3",
     "vite": "^8.0.16"
