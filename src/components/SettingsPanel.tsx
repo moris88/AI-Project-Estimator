@@ -1,4 +1,13 @@
-import { Code2, Cpu, Settings as SettingsIcon, Sparkles, X } from 'lucide-react'
+import {
+	Clipboard,
+	Code2,
+	Cpu,
+	Eye,
+	EyeOff,
+	Settings as SettingsIcon,
+	Sparkles,
+	X,
+} from 'lucide-react'
 import React from 'react'
 import { getModels } from '../lib/utils'
 import type { AIProvider, AppSettings } from '../types'
@@ -24,6 +33,7 @@ export const SettingsPanel = ({
 	onSettingsChange,
 }: SettingsPanelProps) => {
 	const [availableModels, setAvailableModels] = React.useState<string[]>([])
+	const [showApiKey, setShowApiKey] = React.useState(false)
 
 	React.useEffect(() => {
 		if (!isOpen) return
@@ -131,25 +141,59 @@ export const SettingsPanel = ({
 								>
 									{settings.provider.toUpperCase()} API Key
 								</label>
-								<input
-									id="providerApiKey"
-									type="password"
-									value={
-										settings.provider === 'gemini'
-											? settings.geminiKey
-											: settings.provider === 'openai'
-												? settings.openaiKey
-												: settings.anthropicKey
-									}
-									onChange={(e) =>
-										onSettingsChange({
-											...settings,
-											[`${settings.provider}Key`]: e.target.value,
-										})
-									}
-									placeholder={`Incolla la tua ${settings.provider} API key...`}
-									className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
-								/>
+								<div className="relative">
+									<input
+										id="providerApiKey"
+										type={showApiKey ? 'text' : 'password'}
+										value={
+											settings.provider === 'gemini'
+												? settings.geminiKey
+												: settings.provider === 'openai'
+													? settings.openaiKey
+													: settings.anthropicKey
+										}
+										onChange={(e) =>
+											onSettingsChange({
+												...settings,
+												[`${settings.provider}Key`]: e.target.value,
+											})
+										}
+										placeholder={`Incolla la tua ${settings.provider} API key...`}
+										className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-20 pl-4 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
+									/>
+									<button
+										type="button"
+										onClick={() => setShowApiKey((prev) => !prev)}
+										aria-label={showApiKey ? 'Nascondi API key' : 'Mostra API key'}
+										title={showApiKey ? 'Nascondi API key' : 'Mostra API key'}
+										className="absolute inset-y-0 right-9 flex items-center px-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
+									>
+										{showApiKey ? (
+											<EyeOff className="h-4 w-4" />
+										) : (
+											<Eye className="h-4 w-4" />
+										)}
+									</button>
+									<button
+										type="button"
+										onClick={async () => {
+											try {
+												const text = await navigator.clipboard.readText()
+												onSettingsChange({
+													...settings,
+													[`${settings.provider}Key`]: text,
+												})
+											} catch {
+												// accesso agli appunti negato dal browser
+											}
+										}}
+										aria-label="Incolla API key dagli appunti"
+										title="Incolla dagli appunti"
+										className="absolute inset-y-0 right-1 flex items-center px-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
+									>
+										<Clipboard className="h-4 w-4" />
+									</button>
+								</div>
 							</div>
 							<div>
 								<div>
@@ -182,6 +226,6 @@ export const SettingsPanel = ({
 					<p>© {new Date().getFullYear()} AI Project Estimator - Powered by Maurizio Tolomeo</p>
 				</footer>
 			</div>
-		</div>
+		</div >
 	)
 }
