@@ -12,8 +12,8 @@ const EMPTY_PROJECT_INFO: ProjectInfo = {
 	type: 'new',
 	experienceLevel: 'beginner',
 	percentage: {
-		testing: 20,
-		buffer: 20,
+		testing: 5,
+		buffer: 10,
 		changeRequest: 5,
 	},
 	requirements: '',
@@ -137,10 +137,7 @@ export default function App() {
 			</main>
 
 			<footer className="mx-auto max-w-7xl px-4 py-12 text-center text-slate-400 text-sm sm:px-6 lg:px-8 dark:text-slate-500">
-				<p>© 2026 AI Project Estimator - Powered by Multi-LLM Support</p>
-				<p className="mt-1 italic">
-					Basato sugli standard di complessità aziendali Senior Architect
-				</p>
+				<p>© {new Date().getFullYear()} AI Project Estimator - Powered by Maurizio Tolomeo</p>
 			</footer>
 		</div>
 	)

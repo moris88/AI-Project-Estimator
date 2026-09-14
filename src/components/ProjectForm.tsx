@@ -130,7 +130,7 @@ export const ProjectForm = ({
 
 	return (
 		<div className="sticky top-24 max-h-[calc(100vh-10rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-			<div className="sticky top-0 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950">
+			<div className="sticky top-0 flex items-center justify-between gap-4 bg-slate-50 p-6 dark:bg-slate-950 z-50">
 				<h2 className="font-semibold text-lg text-slate-800 dark:text-slate-100">
 					Dati del progetto
 				</h2>
@@ -157,6 +157,11 @@ export const ProjectForm = ({
 						<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
 							Ambito
 						</legend>
+						<p className="text-slate-500 text-xs dark:text-slate-400">
+							Scegli quale parte dell’app deve essere realizzata: <strong>Frontend</strong> è ciò che
+							l’utente vede e usa, <strong>Backend</strong> è ciò che lavora dietro le quinte e{' '}
+							<strong>Full-stack</strong> comprende entrambe.
+						</p>
 						<div className="grid grid-cols-1 gap-2">
 							{(['Frontend', 'Backend', 'Full-stack'] as Scope[]).map((s) => (
 								<button
@@ -183,6 +188,9 @@ export const ProjectForm = ({
 						<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
 							Tipo Progetto
 						</legend>
+						<p className="text-slate-500 text-xs dark:text-slate-400">
+							Scegli se si parte da zero o se si interviene su un’applicazione già esistente.
+						</p>
 						<div className="grid grid-cols-1 gap-2">
 							<button
 								type="button"
@@ -216,8 +224,13 @@ export const ProjectForm = ({
 
 				<fieldset className="space-y-2 px-6">
 					<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
-						Livello di Esperienza del Team (opzionale)
+						Livello di Esperienza del Team
 					</legend>
+					<p className="text-slate-500 text-xs dark:text-slate-400">
+						Indica quanto il team conosce già gli strumenti scelti per questo progetto. Considera la
+						familiarità media delle persone che lavoreranno al progetto, non solo gli anni di
+						esperienza complessivi.
+					</p>
 					<div className="grid grid-cols-2 gap-2">
 						<button
 							type="button"
@@ -246,55 +259,76 @@ export const ProjectForm = ({
 							Esperto
 						</button>
 					</div>
+					<div className="space-y-1 text-slate-500 text-xs dark:text-slate-400">
+						<p>
+							<strong className="font-medium text-slate-600 dark:text-slate-300">Principiante:</strong>{' '}
+							il team ha poca esperienza con gli strumenti scelti o con lavori simili. La stima
+							considera circa il 20% di tempo in più per imparare e gestire gli imprevisti.
+						</p>
+						<p>
+							<strong className="font-medium text-slate-600 dark:text-slate-300">Esperto:</strong>{' '}
+							il team ha già svolto lavori simili e sa usare gli strumenti scelti in autonomia. La
+							stima considera circa il 10% di tempo in meno.
+						</p>
+					</div>
 				</fieldset>
 
 				{/* Percentuali di margine */}
 				<div className="grid grid-cols-3 gap-3 px-6">
-					<div>
+					<div className="col-span-3">
+						<p className="text-slate-500 text-xs dark:text-slate-400">
+							Aggiungi del tempo extra alla stima per tenere conto dei controlli, dei problemi
+							imprevisti e dei possibili cambiamenti durante il progetto.
+						</p>
+					</div>
+					<div className="flex flex-col">
 						<label
 							htmlFor="testing"
-							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+							className="mb-1 flex min-h-8 items-start font-medium text-slate-700 text-xs dark:text-slate-300"
 						>
 							Testing (%)
 						</label>
+						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per controllare che tutto funzioni.</p>
 						<input
 							type="number"
 							id="testing"
 							min={0}
 							max={100}
-							value={projectInfo.percentage?.testing ?? 20}
+							value={projectInfo.percentage?.testing ?? 5}
 							onChange={(e) =>
 								onProjectInfoChange({ percentage: { ...projectInfo.percentage, testing: Number(e.target.value) } })
 							}
 							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 						/>
 					</div>
-					<div>
+					<div className="flex flex-col">
 						<label
 							htmlFor="buffer"
-							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+							className="mb-1 flex min-h-8 items-start font-medium text-slate-700 text-xs dark:text-slate-300"
 						>
 							Imprevisti (%)
 						</label>
+						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per problemi o attività impreviste.</p>
 						<input
 							type="number"
 							id="buffer"
 							min={0}
 							max={100}
-							value={projectInfo.percentage?.buffer ?? 20}
+							value={projectInfo.percentage?.buffer ?? 10}
 							onChange={(e) =>
 								onProjectInfoChange({ percentage: { ...projectInfo.percentage, buffer: Number(e.target.value) } })
 							}
 							className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 						/>
 					</div>
-					<div>
+					<div className="flex flex-col">
 						<label
 							htmlFor="cr"
-							className="mb-1 block font-medium text-slate-700 text-xs dark:text-slate-300"
+							className="mb-1 flex min-h-8 items-start font-medium text-slate-700 text-xs dark:text-slate-300"
 						>
 							Change Request (%)
 						</label>
+						<p className="mb-1 min-h-8 text-slate-500 text-[11px] dark:text-slate-400">Tempo per cambiamenti richiesti in seguito.</p>
 						<input
 							type="number"
 							id="cr"
@@ -346,6 +380,10 @@ export const ProjectForm = ({
 								/>
 							</div>
 						</div>
+						<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
+							Spiega com’è fatta oggi l’app, cosa funziona già e quali parti potrebbero richiedere
+							lavoro prima delle modifiche.
+						</p>
 						<textarea
 							id="existingContext"
 							required
@@ -353,7 +391,7 @@ export const ProjectForm = ({
 							onChange={(e) =>
 								onProjectInfoChange({ existingContext: e.target.value })
 							}
-							placeholder="Descrivi l'app attuale, l'architettura, i moduli già presenti..."
+							placeholder="Es: sito per prenotare visite già online; login e calendario funzionano, ma manca il pagamento..."
 							rows={3}
 							className="w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
 						/>
@@ -366,7 +404,7 @@ export const ProjectForm = ({
 							htmlFor="requirements"
 							className="block font-medium text-slate-700 text-sm dark:text-slate-300"
 						>
-							Nuove Funzionalità / Requisiti
+							Nuove Funzionalità / Requisiti <span className="font-normal text-red-500">(obbligatorio)</span>
 						</label>
 						<div className="flex gap-1.5">
 							<button
@@ -396,14 +434,19 @@ export const ProjectForm = ({
 							/>
 						</div>
 					</div>
+					<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
+						Scrivi cosa vuoi ottenere, chi userà la funzione e quali regole deve rispettare. Più
+						informazioni fornisci, più la stima sarà precisa.
+					</p>
 					<textarea
 						id="requirements"
 						required
+						aria-required="true"
 						value={projectInfo.requirements}
 						onChange={(e) =>
 							onProjectInfoChange({ requirements: e.target.value })
 						}
-						placeholder="Descrivi cosa deve essere aggiunto o modificato..."
+						placeholder="Es: permettere agli utenti di registrarsi, scegliere una data e pagare la prenotazione con carta..."
 						rows={10}
 						className="w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
 					/>
@@ -445,11 +488,15 @@ export const ProjectForm = ({
 							/>
 						</div>
 					</div>
+					<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
+						Aggiungi regole o richieste particolari, ad esempio sicurezza, velocità, scadenze o
+						informazioni utili che non hai inserito sopra.
+					</p>
 					<textarea
 						id="notes"
 						value={projectInfo.notes || ''}
 						onChange={(e) => onProjectInfoChange({ notes: e.target.value })}
-						placeholder="Vincoli particolari, performance, sicurezza..."
+						placeholder="Es: deve funzionare bene da smartphone, rispettare la privacy e andare online entro il 30 giugno..."
 						rows={5}
 						className="w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
 					/>
@@ -461,6 +508,10 @@ export const ProjectForm = ({
 							<FileText className="h-4 w-4 text-blue-600" />
 							Stime precedenti in PDF (opzionale)
 						</label>
+						<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
+							Allega stime già approvate o progetti comparabili per fornire all’AI un riferimento
+							storico. Il contenuto viene usato solo come contesto.
+						</p>
 						<input
 							id="previous-estimates"
 							type="file"
@@ -471,7 +522,8 @@ export const ProjectForm = ({
 							className="block w-full cursor-pointer rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-sm file:mr-4 file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:font-medium file:text-white hover:file:bg-blue-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
 						/>
 						<p className="mt-1 text-slate-400 text-xs">
-							Puoi allegare fino a {MAX_REFERENCE_PDFS} PDF. Il testo verrà usato come contesto dall'AI.
+							Puoi allegare fino a {MAX_REFERENCE_PDFS} PDF con stime precedenti o progetti simili.
+							Il contenuto verrà usato come riferimento.
 						</p>
 						{pdfLoading && (
 							<p className="mt-2 flex items-center gap-2 text-blue-600 text-xs">
@@ -514,28 +566,28 @@ export const ProjectForm = ({
 				)}
 
 				<div className="sticky bottom-0 flex w-full items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
-				<button
-					type="submit"
-					disabled={loading}
-					className={cn(
-						'flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-all active:scale-[0.98]',
-						loading
-							? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
-							: 'bg-blue-600 text-white hover:bg-blue-700',
-					)}
-				>
-					{loading ? (
-						<>
-							<Loader2 className="h-5 w-5 animate-spin" />
-							Elaborazione in corso...
-						</>
-					) : (
-						<>
-							<Send className="h-5 w-5" />
-							Genera Stima
-						</>
-					)}
-				</button>
+					<button
+						type="submit"
+						disabled={loading}
+						className={cn(
+							'flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-all active:scale-[0.98]',
+							loading
+								? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
+								: 'bg-blue-600 text-white hover:bg-blue-700',
+						)}
+					>
+						{loading ? (
+							<>
+								<Loader2 className="h-5 w-5 animate-spin" />
+								Elaborazione in corso...
+							</>
+						) : (
+							<>
+								<Send className="h-5 w-5" />
+								Genera Stima
+							</>
+						)}
+					</button>
 				</div>
 			</form>
 		</div>

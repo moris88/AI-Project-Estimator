@@ -4,6 +4,28 @@ import { generateEstimateGemini } from "../lib/gemini";
 import { generateEstimateOpenAI } from "../lib/openai";
 import type { AppSettings, EstimationResult, ProjectInfo } from "../types";
 
+const splitEstimateSections = (fullText: string): [string, string] => {
+  const separatorMatch = /---\s*SEPARATOR\s*---/i;
+  const separatorSections = fullText.split(separatorMatch);
+
+  if (separatorSections.length > 1) {
+    return [separatorSections[0], separatorSections.slice(1).join("\n")];
+  }
+
+  const planningHeading = fullText.search(
+    /\n\s*#{1,6}\s*(?:Pianificazione(?:\s+Settimanale|\s+degli\s+Sprint)?|Sprints?)\b/i,
+  );
+
+  if (planningHeading >= 0) {
+    return [
+      fullText.slice(0, planningHeading),
+      fullText.slice(planningHeading),
+    ];
+  }
+
+  return [fullText, ""];
+};
+
 export const useEstimate = (
   settings: AppSettings,
   projectInfo: ProjectInfo,
@@ -32,6 +54,11 @@ export const useEstimate = (
 
     if (selectedTechs.length === 0) {
       setError("Seleziona almeno una tecnologia");
+      return;
+    }
+
+    if (!projectInfo.requirements.trim()) {
+      setError("Inserisci almeno un requisito del progetto");
       return;
     }
 
@@ -67,7 +94,7 @@ export const useEstimate = (
         fullText = await generateEstimateAnthropic(...commonParams);
       }
 
-      const [stima, sprints] = fullText.split("---SEPARATOR---");
+      const [stima, sprints] = splitEstimateSections(fullText);
       setResult({ stima: stima || fullText, sprints: sprints || "" });
     } catch (err: any) {
       setError(err.message || "Errore durante la generazione");
@@ -123,7 +150,7 @@ Per favore, rigenera la stima mantenendo la struttura e il formato precedente, a
         fullText = await generateEstimateAnthropic(...commonParams);
       }
 
-      const [stima, sprints] = fullText.split("---SEPARATOR---");
+      const [stima, sprints] = splitEstimateSections(fullText);
       setResult({ stima: stima || fullText, sprints: sprints || "" });
     } catch (err: any) {
       setError(err.message || "Errore durante l'aggiornamento della stima");

@@ -1,6 +1,7 @@
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { techStacks } from '../lib/constants'
+import { cn } from '../utils/cn'
 
 interface TechStackSelectorProps {
 	selectedTechs: string[]
@@ -63,9 +64,18 @@ export const TechStackSelector = ({
 		<div className={className}>
 			<div className="flex items-center justify-between">
 				<span className="block font-medium text-slate-700 text-sm dark:text-slate-300">
-					Stack Tecnologico
+					Stack Tecnologico <span className="font-normal text-red-500">(obbligatorio)</span>
 				</span>
 			</div>
+			<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
+				Indica con quali strumenti verrà costruita l’app, ad esempio React o Python. Servono per
+				capire meglio il lavoro da svolgere e i tempi necessari.
+			</p>
+			{selectedTechs.length === 0 && (
+				<p className="mb-2 text-red-600 text-xs dark:text-red-300" role="status">
+					Aggiungi almeno una tecnologia, scegliendola dall’elenco o scrivendone una personalizzata.
+				</p>
+			)}
 
 			<div className="mb-3 flex flex-wrap gap-2">
 				{selectedTechs.map((techValue) => (
@@ -92,12 +102,19 @@ export const TechStackSelector = ({
 				<input
 					type="text"
 					value={techSearch ?? ''}
+					aria-required="true"
+					aria-label="Cerca o aggiungi una tecnologia"
 					onChange={(e) => setTechSearch(e.target.value)}
 					onKeyDown={handleKeyDown}
 					onFocus={() => setShowDropdown(true)}
 					onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
 					placeholder="Cerca o aggiungi tecnologia (es: React, Rust...)"
-					className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-4 pl-10 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
+					className={cn(
+						'w-full rounded-lg border bg-white py-2 pr-4 pl-10 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500',
+						selectedTechs.length === 0
+							? 'border-red-300 dark:border-red-800'
+							: 'border-slate-200 dark:border-slate-700',
+					)}
 				/>
 				{showDropdown && (
 					<div className="fade-in slide-in-from-top-2 absolute z-20 mt-1 max-h-60 w-full animate-in overflow-auto rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
@@ -126,7 +143,7 @@ export const TechStackSelector = ({
 									<span className="font-semibold text-slate-800 text-sm dark:text-slate-100">
 										{tech.name}
 									</span>
-									<span className="truncate text-slate-500 text-xs dark:text-slate-400">
+									<span className="text-slate-500 text-xs dark:text-slate-400 line-clamp-2">
 										{tech.description}
 									</span>
 								</button>

@@ -83,11 +83,29 @@ Vincoli Temporali Mandatori:
 - Testing: Massimo ${testingPercentage}% del totale ore (per progetti esistenti, assicurati che copra i test di regressione).
 - Buffer Imprevisti: Aggiungi un buffer del ${bufferPercentage}% sul totale ore.
 - Aggiungi un ${changeRequestPercentage}% di ore per eventuali richieste di modifica.
+- Riduci le ore del 40% per tenere conto dell'ottimizzazione tramite strumenti AI.
 
 Istruzioni di Output:
-Genera DUE SEZIONI distinte, separate da una riga con il testo "---SEPARATOR---".
+Genera DUE SEZIONI distinte. Dopo la prima sezione inserisci una riga contenente ESATTAMENTE
+---SEPARATOR---
+Non modificare il separatore, non racchiuderlo in un blocco di codice e non aggiungere testo sulla stessa riga.
+Entrambe le sezioni devono essere scritte RIGOROSAMENTE in Markdown valido e devono mantenere la
+formattazione Markdown in ogni parte del documento. Usa titoli Markdown con #, elenchi con -,
+elenchi numerati e tabelle Markdown con | quando appropriato. Non restituire JSON, HTML o testo
+senza formattazione e non racchiudere le sezioni intere in blocchi di codice Markdown.
+
+Lo stile del Markdown deve essere moderno, ordinato e piacevole da leggere anche per un utente non
+tecnico. Evita muri di testo: usa paragrafi brevi, titoli e sottotitoli descrittivi, spazio tra le
+sezioni, elenchi puntati per i concetti principali e grassetto solo per evidenziare le informazioni
+importanti. Usa tabelle compatte e leggibili per ore, giornate e riepiloghi; mantieni le colonne
+coerenti e inserisci sempre una riga di intestazione. Organizza ogni sprint in blocchi facilmente
+scansionabili con obiettivo, attività e risultato atteso. Non usare emoji, colori tramite HTML,
+decorazioni eccessive o formattazioni decorative che non siano Markdown standard. Inserisci una
+riga vuota tra ogni titolo, paragrafo, elenco, tabella e blocco di contenuto per migliorare la
+leggibilità. Non mettere più contenuti diversi nello stesso paragrafo.
 
 SEZIONE 1 (Stima):
+# Stima del Progetto
 Documento in formato Markdown con questa struttura:
 - Obiettivo del Progetto
 - Classificazione Progetto (Specifica se Nuovo o Evolutivo)
@@ -96,11 +114,33 @@ Documento in formato Markdown con questa struttura:
 - Vincoli e Assunzioni
 - Criticità e Rischi
 
-SEZIONE 2 (Sprints):
-Documento in formato Markdown con la pianificazione degli sprint:
-- Struttura gli sprint (es. Sprint 1, Sprint 2).
-- TODO LIST dettagliata per ogni sprint.
-- Obiettivo chiaro e deliverable.
+SEZIONE 2 (Pianificazione settimanale):
+# Pianificazione Settimanale
+Crea una roadmap operativa dell'implementazione organizzata per settimane consecutive. Non limitarti
+a elencare gli sprint e non usare attività generiche come "sviluppo feature" o "implementazione":
+ogni attività deve spiegare concretamente cosa viene fatto.
+
+Regole obbligatorie per la pianificazione:
+- Considera una settimana lavorativa di 5 giorni e 40 ore, salvo diversa indicazione nei requisiti.
+- Distribuisci le ore e le attività in modo coerente con la stima della prima sezione; non inventare
+  ore scollegate dal totale stimato.
+- Indica per ogni settimana l'obiettivo principale, le attività e il risultato verificabile alla fine.
+- Dividi ogni attività complessa in sotto-attività operative e dettagliate.
+- Per ogni attività specifica: cosa viene realizzato, quali passaggi comprende, quante ore richiede,
+  da cosa dipende e come si verifica che sia completata.
+- Indica chiaramente le attività di analisi, configurazione, sviluppo, collegamento con servizi esterni,
+  gestione degli errori, test, correzioni, pubblicazione e supporto finale quando pertinenti.
+- Evidenzia le dipendenze tra attività e indica il percorso critico, cioè le attività che possono
+  ritardare l'intero progetto.
+- Inserisci una tabella iniziale con: Settimana, Obiettivo, Attività principali, Ore previste,
+  Risultato atteso.
+- Dopo la tabella, crea una sezione dettagliata per ogni settimana. Usa questo schema:
+  - Obiettivo della settimana
+  - Attività numerate con sotto-attività, ore, dipendenze e criterio di completamento
+  - Risultato verificabile della settimana
+  - Rischi o punti di attenzione, solo se presenti
+- Concludi con una breve sezione "Mappa delle dipendenze" e una sezione "Percorso critico".
+- Mantieni una riga vuota tra settimana, attività e sotto-attività per rendere il documento leggibile.
 
 Non inserire alcuna spiegazione o testo al di fuori dei documenti Markdown e nessuna intestazione. Non menzionare mai le soglie minime o i vincoli nei documenti, ma assicurati che siano rispettati nella stima finale. No conclusioni o raccomandazioni, solo la stima e la pianificazione degli sprint.
 
