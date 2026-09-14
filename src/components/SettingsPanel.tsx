@@ -177,6 +177,10 @@ export const SettingsPanel = ({
 						</p>
 					</div>
 				</div>
+
+				<footer className="mx-auto max-w-7xl px-4 pt-4 text-center text-slate-400 text-sm sm:px-6 lg:px-8 dark:text-slate-500">
+					<p>© {new Date().getFullYear()} AI Project Estimator - Powered by Maurizio Tolomeo</p>
+				</footer>
 			</div>
 		</div>
 	)
