@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { DesktopDownloadToast } from './components/DesktopDownloadToast'
 import { Header } from './components/Header'
 import { ProjectForm } from './components/ProjectForm'
 import { ResultView } from './components/ResultView'
@@ -22,6 +23,9 @@ const EMPTY_PROJECT_INFO: ProjectInfo = {
 	previousEstimates: [],
 }
 
+const DESKTOP_DOWNLOAD_TOAST_DISMISSED_KEY = 'desktop-download-toast-dismissed'
+const isWebApp = import.meta.env.VITE_APP === 'web'
+
 export default function App() {
 	const [darkMode, setDarkMode] = useState(() => {
 		const saved = localStorage.getItem('stime-dark-mode')
@@ -34,25 +38,35 @@ export default function App() {
 		return saved
 			? JSON.parse(saved)
 			: {
-				provider: 'gemini',
-				geminiKey: '',
-				openaiKey: '',
-				anthropicKey: '',
-				model: 'gemini-3.1-fresh-lite',
-			}
+					provider: 'gemini',
+					geminiKey: '',
+					openaiKey: '',
+					anthropicKey: '',
+					model: 'gemini-3.1-fresh-lite',
+				}
 	})
 
-	const [projectInfo, setProjectInfo] = useState<ProjectInfo>(EMPTY_PROJECT_INFO)
+	const [projectInfo, setProjectInfo] =
+		useState<ProjectInfo>(EMPTY_PROJECT_INFO)
 	const [selectedTechs, setSelectedTechs] = useState<string[]>([])
 	const [showSettings, setShowSettings] = useState(
 		!settings.geminiKey && !settings.openaiKey && !settings.anthropicKey,
 	)
-
-	const { generateEstimate, refineEstimate, resetEstimate, loading, refining, result, error } = useEstimate(
-		settings,
-		projectInfo,
-		selectedTechs,
+	const [showDesktopDownloadToast, setShowDesktopDownloadToast] = useState(
+		() =>
+			isWebApp &&
+			localStorage.getItem(DESKTOP_DOWNLOAD_TOAST_DISMISSED_KEY) !== 'true',
 	)
+
+	const {
+		generateEstimate,
+		refineEstimate,
+		resetEstimate,
+		loading,
+		refining,
+		result,
+		error,
+	} = useEstimate(settings, projectInfo, selectedTechs)
 
 	useEffect(() => {
 		localStorage.setItem('stime-settings-v2', JSON.stringify(settings))
@@ -86,10 +100,15 @@ export default function App() {
 		resetEstimate()
 	}
 
+	const handleDismissDesktopDownloadToast = () => {
+		localStorage.setItem(DESKTOP_DOWNLOAD_TOAST_DISMISSED_KEY, 'true')
+		setShowDesktopDownloadToast(false)
+	}
+
 	const hasApiKey = Boolean(
 		(settings.provider === 'gemini' && settings.geminiKey) ||
-		(settings.provider === 'openai' && settings.openaiKey) ||
-		(settings.provider === 'anthropic' && settings.anthropicKey),
+			(settings.provider === 'openai' && settings.openaiKey) ||
+			(settings.provider === 'anthropic' && settings.anthropicKey),
 	)
 
 	return (
@@ -101,10 +120,18 @@ export default function App() {
 				darkMode={darkMode}
 				onToggleDarkMode={() => setDarkMode((current) => !current)}
 			/>
+			{showDesktopDownloadToast && (
+				<DesktopDownloadToast onDismiss={handleDismissDesktopDownloadToast} />
+			)}
 
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				{showSettings && (
-					<SettingsPanel isOpen={showSettings} onClose={() => setShowSettings(false)} settings={settings} onSettingsChange={setSettings} />
+					<SettingsPanel
+						isOpen={showSettings}
+						onClose={() => setShowSettings(false)}
+						settings={settings}
+						onSettingsChange={setSettings}
+					/>
 				)}
 
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

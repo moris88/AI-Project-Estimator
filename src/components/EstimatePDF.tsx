@@ -159,19 +159,39 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 		return parts.map((part, index) => {
 			if (!part) return null
 			if (part.startsWith('**') || part.startsWith('__')) {
-				return <Text key={index} style={styles.bold}>{part.slice(2, -2)}</Text>
+				return (
+					<Text key={index} style={styles.bold}>
+						{part.slice(2, -2)}
+					</Text>
+				)
 			}
 			if (part.startsWith('~~')) {
-				return <Text key={index} style={styles.strikethrough}>{part.slice(2, -2)}</Text>
+				return (
+					<Text key={index} style={styles.strikethrough}>
+						{part.slice(2, -2)}
+					</Text>
+				)
 			}
 			if (part.startsWith('`')) {
-				return <Text key={index} style={styles.code}>{part.slice(1, -1)}</Text>
+				return (
+					<Text key={index} style={styles.code}>
+						{part.slice(1, -1)}
+					</Text>
+				)
 			}
 			if (part.startsWith('[')) {
-				return <Text key={index}>{part.replace(/^\[([^\]]+)\]\([^)]+\)$/, '$1')}</Text>
+				return (
+					<Text key={index}>
+						{part.replace(/^\[([^\]]+)\]\([^)]+\)$/, '$1')}
+					</Text>
+				)
 			}
 			if (part.startsWith('*') || part.startsWith('_')) {
-				return <Text key={index} style={styles.italic}>{part.slice(1, -1)}</Text>
+				return (
+					<Text key={index} style={styles.italic}>
+						{part.slice(1, -1)}
+					</Text>
+				)
 			}
 			return <Text key={index}>{part}</Text>
 		})
@@ -299,7 +319,9 @@ export const EstimatePDF = ({ content, projectInfo }: EstimatePDFProps) => {
 						// 2. Riconoscimento Liste (Puntate e Numerate)
 						const listMatch = line.match(/^([-*+]|\d+\.)\s+(.+)$/)
 						if (listMatch) {
-							const bulletSymbol = listMatch[1].match(/\d+\./) ? listMatch[1] : '•'
+							const bulletSymbol = listMatch[1].match(/\d+\./)
+								? listMatch[1]
+								: '•'
 							return (
 								<View key={i} style={styles.listItem}>
 									<Text style={styles.bullet}>{bulletSymbol}</Text>

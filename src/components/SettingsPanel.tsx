@@ -74,17 +74,15 @@ export const SettingsPanel = ({
 	}
 
 	return (
-		<div
-			className="fade-in fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/50 p-4 backdrop-blur-sm duration-200"
-		>
-			<div
-				className="zoom-in-95 relative max-h-[90vh] w-full max-w-2xl animate-in overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 dark:border-slate-800 dark:bg-slate-900"
-			>
+		<div className="fade-in fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/50 p-4 backdrop-blur-sm duration-200">
+			<div className="zoom-in-95 relative max-h-[90vh] w-full max-w-2xl animate-in overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 dark:border-slate-800 dark:bg-slate-900">
 				{/* Header con titolo e pulsante di chiusura */}
 				<div className="mb-6 flex items-center justify-between border-slate-100 border-b pb-4 dark:border-slate-800">
 					<div className="flex items-center gap-2">
 						<SettingsIcon className="h-5 w-5 text-blue-600" />
-						<h2 className="font-semibold text-lg">Configurazione AI Provider</h2>
+						<h2 className="font-semibold text-lg">
+							Configurazione AI Provider
+						</h2>
 					</div>
 					<button
 						type="button"
@@ -164,7 +162,9 @@ export const SettingsPanel = ({
 									<button
 										type="button"
 										onClick={() => setShowApiKey((prev) => !prev)}
-										aria-label={showApiKey ? 'Nascondi API key' : 'Mostra API key'}
+										aria-label={
+											showApiKey ? 'Nascondi API key' : 'Mostra API key'
+										}
 										title={showApiKey ? 'Nascondi API key' : 'Mostra API key'}
 										className="absolute inset-y-0 right-9 flex items-center px-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
 									>
@@ -223,9 +223,12 @@ export const SettingsPanel = ({
 				</div>
 
 				<footer className="mx-auto max-w-7xl px-4 pt-4 text-center text-slate-400 text-sm sm:px-6 lg:px-8 dark:text-slate-500">
-					<p>© {new Date().getFullYear()} AI Project Estimator - Powered by Maurizio Tolomeo</p>
+					<p>
+						© {new Date().getFullYear()} AI Project Estimator - Powered by
+						Maurizio Tolomeo
+					</p>
 				</footer>
 			</div>
-		</div >
+		</div>
 	)
 }

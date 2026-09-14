@@ -1,31 +1,31 @@
 export function createPrompt(
-  techStack: string,
-  scope: "Frontend" | "Backend" | "Full-stack",
-  experienceLevel: "beginner" | "experienced",
-  testingPercentage: number,
-  bufferPercentage: number,
-  changeRequestPercentage: number,
-  requirements: string,
-  notes: string,
-  isExistingProject: boolean,
-  existingContext: string,
-  previousEstimates: string,
+	techStack: string,
+	scope: 'Frontend' | 'Backend' | 'Full-stack',
+	experienceLevel: 'beginner' | 'experienced',
+	testingPercentage: number,
+	bufferPercentage: number,
+	changeRequestPercentage: number,
+	requirements: string,
+	notes: string,
+	isExistingProject: boolean,
+	existingContext: string,
+	previousEstimates: string,
 ): string {
-  const projectTypeHeader = isExistingProject
-    ? `TIPO PROGETTO: Evolutivo/Manutenzione su base di codice ESISTENTE.\nCONTESTO ATTUALE: ${existingContext}`
-    : "TIPO PROGETTO: Nuovo Progetto (Greenfield).";
+	const projectTypeHeader = isExistingProject
+		? `TIPO PROGETTO: Evolutivo/Manutenzione su base di codice ESISTENTE.\nCONTESTO ATTUALE: ${existingContext}`
+		: 'TIPO PROGETTO: Nuovo Progetto (Greenfield).'
 
-  const adjustmentLogic = isExistingProject
-    ? `
+	const adjustmentLogic = isExistingProject
+		? `
 ISTRUZIONI SPECIALI PER PROGETTI ESISTENTI:
 1. Analisi e Integrazione: Includi task specifici per l'analisi dell'architettura esistente e l'integrazione delle nuove feature.
 2. Setup: Non prevedere setup infrastrutturale da zero, ma solo eventuale configurazione di nuovi moduli.
 3. Regression Testing: Dedica particolare attenzione alla verifica che le nuove feature non impattino negativamente sulle funzionalità esistenti.
 4. Vincoli: Considera la compatibilità con lo stack e le librerie già in uso.
 `
-    : "";
+		: ''
 
-  return `
+	return `
 Ruolo: Agisci come un Senior Software Architect. Il tuo compito è generare un documento di stima professionale per un progetto basato su ${techStack} (${scope}). Non uscire mai dallo stack e scope indicati.
 
 ${projectTypeHeader}
@@ -147,7 +147,7 @@ Non inserire alcuna spiegazione o testo al di fuori dei documenti Markdown e nes
 Dati del Progetto:
 ${requirements}
 
-${notes ? `Note Aggiuntive:\n${notes}` : ""}
-${previousEstimates ? `\nSTIME DI PROGETTI PRECEDENTI (usale come riferimento, non copiarle):\n${previousEstimates}` : ""}
-`;
+${notes ? `Note Aggiuntive:\n${notes}` : ''}
+${previousEstimates ? `\nSTIME DI PROGETTI PRECEDENTI (usale come riferimento, non copiarle):\n${previousEstimates}` : ''}
+`
 }

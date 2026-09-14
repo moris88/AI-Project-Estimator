@@ -21,14 +21,14 @@ export const TechStackSelector = ({
 
 	// Verifica se la voce cercata è già presente tra quelle selezionate
 	const isAlreadySelected = selectedTechs.some(
-		(tech) => tech.toLowerCase() === query.toLowerCase()
+		(tech) => tech.toLowerCase() === query.toLowerCase(),
 	)
 
 	// Verifica se esiste già un match esatto tra le opzioni predefinite
 	const hasExactMatchInPreset = techStacks.some(
 		(tech) =>
 			tech.name.toLowerCase() === query.toLowerCase() ||
-			tech.value.toLowerCase() === query.toLowerCase()
+			tech.value.toLowerCase() === query.toLowerCase(),
 	)
 
 	const filteredTechs = techStacks.filter((tech) => {
@@ -64,16 +64,22 @@ export const TechStackSelector = ({
 		<div className={className}>
 			<div className="flex items-center justify-between">
 				<span className="block font-medium text-slate-700 text-sm dark:text-slate-300">
-					Stack Tecnologico <span className="font-normal text-red-500">(obbligatorio)</span>
+					Stack Tecnologico{' '}
+					<span className="font-normal text-red-500">(obbligatorio)</span>
 				</span>
 			</div>
 			<p className="mb-2 text-slate-500 text-xs dark:text-slate-400">
-				Indica con quali strumenti verrà costruita l’app, ad esempio React o Python. Servono per
-				capire meglio il lavoro da svolgere e i tempi necessari.
+				Indica con quali strumenti verrà costruita l’app, ad esempio React o
+				Python. Servono per capire meglio il lavoro da svolgere e i tempi
+				necessari.
 			</p>
 			{selectedTechs.length === 0 && (
-				<p className="mb-2 text-red-600 text-xs dark:text-red-300" role="status">
-					Aggiungi almeno una tecnologia, scegliendola dall’elenco o scrivendone una personalizzata.
+				<p
+					className="mb-2 text-red-600 text-xs dark:text-red-300"
+					role="status"
+				>
+					Aggiungi almeno una tecnologia, scegliendola dall’elenco o scrivendone
+					una personalizzata.
 				</p>
 			)}
 
@@ -132,29 +138,27 @@ export const TechStackSelector = ({
 							</button>
 						)}
 
-						{filteredTechs.length > 0 ? (
-							filteredTechs.map((tech) => (
-								<button
-									key={tech.value}
-									type="button"
-									onClick={() => handleToggle(tech.value)}
-									className="flex w-full flex-col border-slate-100 border-b px-4 py-3 text-left last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
-								>
-									<span className="font-semibold text-slate-800 text-sm dark:text-slate-100">
-										{tech.name}
-									</span>
-									<span className="text-slate-500 text-xs dark:text-slate-400 line-clamp-2">
-										{tech.description}
-									</span>
-								</button>
-							))
-						) : (
-							!query && (
-								<div className="px-4 py-3 text-slate-500 text-sm italic dark:text-slate-400">
-									Nessuna tecnologia trovata
-								</div>
-							)
-						)}
+						{filteredTechs.length > 0
+							? filteredTechs.map((tech) => (
+									<button
+										key={tech.value}
+										type="button"
+										onClick={() => handleToggle(tech.value)}
+										className="flex w-full flex-col border-slate-100 border-b px-4 py-3 text-left last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+									>
+										<span className="font-semibold text-slate-800 text-sm dark:text-slate-100">
+											{tech.name}
+										</span>
+										<span className="line-clamp-2 text-slate-500 text-xs dark:text-slate-400">
+											{tech.description}
+										</span>
+									</button>
+								))
+							: !query && (
+									<div className="px-4 py-3 text-slate-500 text-sm italic dark:text-slate-400">
+										Nessuna tecnologia trovata
+									</div>
+								)}
 					</div>
 				)}
 			</div>

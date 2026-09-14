@@ -11,11 +11,12 @@ Utilizzando modelli linguistici avanzati (LLM), l'applicazione analizza lo stack
 - **Configurazione dell'Ambito**: Definisci se il progetto è Frontend, Backend, Fullstack o Mobile.
 - **Generazione PDF**: Esporta le tue stime in un formato PDF professionale pronto per essere condiviso con i clienti.
 - **Interfaccia Moderna**: UI pulita e reattiva costruita con React e Tailwind CSS.
-- **Privacy First**: Le tue chiavi API vengono salvate localmente nel browser (`localStorage`) e non vengono mai inviate a server intermedi.
+- **Privacy First**: Le chiavi API sono salvate localmente nel `localStorage` dell'app e non vengono inviate a server intermedi.
 
 ## 🚀 Tecnologie utilizzate
 
 - **Frontend**: React 19, TypeScript, Vite
+- **Desktop**: Electron, electron-vite, electron-builder
 - **Styling**: Tailwind CSS
 - **Icone**: Lucide React
 - **Generazione PDF**: @react-pdf/renderer
@@ -40,13 +41,37 @@ Assicurati di avere [Node.js](https://nodejs.org/) installato.
    # oppure npm install / yarn install
    ```
 
-3. Avvia l'applicazione in modalità sviluppo:
+3. Scegli la modalità di sviluppo nel file `.env`:
+
+   ```dotenv
+   VITE_APP="desktop"
+   VITE_ENV="development"
+   ```
+
+   I valori supportati per `VITE_APP` sono:
+
+   - `desktop`: avvia l'app Electron.
+   - `web`: avvia solo l'app Vite nel browser.
+
+4. Avvia l'applicazione:
 
    ```bash
    pnpm dev
    ```
 
-4. Apri il browser all'indirizzo `http://localhost:3000`.
+   In modalità `web`, l'app è disponibile su `http://localhost:3000`. In modalità `desktop`, Electron carica il renderer su `http://localhost:5173`.
+
+   Con `VITE_ENV="development"`, la finestra Electron apre automaticamente le DevTools.
+
+## Distribuzione desktop
+
+Genera gli archivi ZIP x64 per Windows e Linux nella cartella `dist`:
+
+```bash
+pnpm build:electron
+```
+
+Per impostare un'icona personalizzata, aggiungi alla configurazione `build` in `package.json` un PNG di almeno 256x256 pixel presente in `resources`.
 
 ## ⚙️ Configurazione
 

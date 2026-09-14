@@ -3,7 +3,7 @@ name: "Code Duplication Analysis"
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
   workflow_dispatch:
 
 permissions:
@@ -16,18 +16,17 @@ jobs:
     name: "Analyze code duplication in PR"
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v6
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 11
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Fetch main branch
         run: git fetch origin main --unshallow || true
@@ -62,9 +61,6 @@ jobs:
           commits=$(git rev-list "${{ steps.base.outputs.base }}..HEAD" --count)
           echo "commits=$commits" >> $GITHUB_OUTPUT
 
-      - name: Install jscpd
-        run: pnpm add -g jscpd
-
       - name: Run jscpd on PR files
         id: jscpd_pr
         run: |
@@ -74,7 +70,7 @@ jobs:
             exit 0
           fi
           echo "skipped=false" >> $GITHUB_OUTPUT
-          jscpd $files \
+          pnpm dlx jscpd $files \
             --reporters json,markdown \
             --output report \
             --min-lines 5 \
@@ -85,7 +81,7 @@ jobs:
         if: steps.jscpd_pr.outputs.skipped != 'true'
         run: |
           git worktree add /tmp/main-wt origin/main
-          jscpd /tmp/main-wt/src \
+          pnpm dlx jscpd /tmp/main-wt/src \
             --reporters json \
             --output report_main \
             --min-lines 5 \
@@ -103,7 +99,7 @@ jobs:
             report_main
 
       - name: Comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: always()
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -173,39 +169,45 @@ jobs:
               body += `### ✅ No duplication found in changed files.\n\n`;
             } else {
               const reportDiff = JSON.parse(fs.readFileSync(jsonPathDiff, 'utf8'));
-              const total = reportDiff.statistics.total;
-              pctDiff = total.percentage || 0;
-              clones = total.clones || 0;
+              const total = reportDiff.statistics?.total;
+              if (!total) {
+                body += `### ⚠️ Duplication report unavailable.\n\n`;
+              } else {
+                pctDiff = total.percentage || 0;
+                clones = total.clones || 0;
 
-              let pctMain = 0;
-              if (fs.existsSync(jsonPathMain)) {
-                const reportMain = JSON.parse(fs.readFileSync(jsonPathMain, 'utf8'));
-                pctMain = reportMain.statistics.total.percentage || 0;
-              }
-              const delta = pctDiff - pctMain;
-              const deltaSign = delta > 0 ? '+' : '';
-              const trendArrow = delta > 0 ? '📈' : delta < 0 ? '📉' : '⚖️';
-
-              const statusEmoji = pctDiff === 0 ? '✅' : pctDiff <= MAX_DUPLICATION ? '⚠️' : '❌';
-              const badge = pctDiff === 0 ? 'PASS' : pctDiff <= MAX_DUPLICATION ? 'WARN' : 'FAIL';
-
-              body += `### ${statusEmoji} Duplication: **${badge}** — \`${pctDiff.toFixed(2)}%\` (${trendArrow} \`${deltaSign}${delta.toFixed(2)}%\` vs main)\n\n`;
-              body += `> Threshold: **${MAX_DUPLICATION}%** | Found **${clones}** duplicate block${clones !== 1 ? 's' : ''} across ${total.sources} file${total.sources !== 1 ? 's' : ''}\n\n`;
-
-              if (clones > 0) {
-                let table = `| Format | Files | Lines | Clones | Duplicated (%) |\n|---|---|---|---|---|\n`;
-                for (const fmt in reportDiff.statistics.formats) {
-                  const s = reportDiff.statistics.formats[fmt].total;
-                  table += `| \`${fmt}\` | ${s.sources} | ${s.lines} | ${s.clones} | ${s.duplicatedLines} (${s.percentage.toFixed(2)}%) |\n`;
+                let pctMain = 0;
+                if (fs.existsSync(jsonPathMain)) {
+                  const reportMain = JSON.parse(fs.readFileSync(jsonPathMain, 'utf8'));
+                  pctMain = reportMain.statistics?.total?.percentage || 0;
                 }
-                table += `| **Total** | ${total.sources} | ${total.lines} | ${total.clones} | ${total.duplicatedLines} (${total.percentage.toFixed(2)}%) |`;
-                body += `<details>\n<summary>📊 Statistics by format</summary>\n\n${table}\n\n</details>\n\n`;
+                const delta = pctDiff - pctMain;
+                const deltaSign = delta > 0 ? '+' : '';
+                const trendArrow = delta > 0 ? '📈' : delta < 0 ? '📉' : '⚖️';
 
-                const blocks = reportDiff.duplicates.map((d, i) => {
-                  const snippet = d.fragment ? `\n\`\`\`${d.format}\n${d.fragment.trim()}\n\`\`\`\n` : '';
-                  return `**#${i + 1}** \`${d.firstFile.name}\` (L${d.firstFile.start}–${d.firstFile.end}) ↔ \`${d.secondFile.name}\` (L${d.secondFile.start}–${d.secondFile.end})${snippet}`;
-                }).join('\n\n');
-                body += `<details>\n<summary>📄 Duplicate blocks (${clones})</summary>\n\n${blocks}\n\n</details>\n\n`;
+                const statusEmoji = pctDiff === 0 ? '✅' : pctDiff <= MAX_DUPLICATION ? '⚠️' : '❌';
+                const badge = pctDiff === 0 ? 'PASS' : pctDiff <= MAX_DUPLICATION ? 'WARN' : 'FAIL';
+
+                body += `### ${statusEmoji} Duplication: **${badge}** — \`${pctDiff.toFixed(2)}%\` (${trendArrow} \`${deltaSign}${delta.toFixed(2)}%\` vs main)\n\n`;
+                body += `> Threshold: **${MAX_DUPLICATION}%** | Found **${clones}** duplicate block${clones !== 1 ? 's' : ''} across ${total.sources} file${total.sources !== 1 ? 's' : ''}\n\n`;
+
+                if (clones > 0) {
+                  let table = `| Format | Files | Lines | Clones | Duplicated (%) |\n|---|---|---|---|---|\n`;
+                  for (const fmt in reportDiff.statistics?.formats || {}) {
+                    const formatStats = reportDiff.statistics.formats[fmt];
+                    const s = formatStats?.total || formatStats;
+                    if (!s) continue;
+                    table += `| \`${fmt}\` | ${s.sources} | ${s.lines} | ${s.clones} | ${s.duplicatedLines} (${s.percentage.toFixed(2)}%) |\n`;
+                  }
+                  table += `| **Total** | ${total.sources} | ${total.lines} | ${total.clones} | ${total.duplicatedLines} (${total.percentage.toFixed(2)}%) |`;
+                  body += `<details>\n<summary>📊 Statistics by format</summary>\n\n${table}\n\n</details>\n\n`;
+
+                  const blocks = reportDiff.duplicates.map((d, i) => {
+                    const snippet = d.fragment ? `\n\`\`\`${d.format}\n${d.fragment.trim()}\n\`\`\`\n` : '';
+                    return `**#${i + 1}** \`${d.firstFile.name}\` (L${d.firstFile.start}–${d.firstFile.end}) ↔ \`${d.secondFile.name}\` (L${d.secondFile.start}–${d.secondFile.end})${snippet}`;
+                  }).join('\n\n');
+                  body += `<details>\n<summary>📄 Duplicate blocks (${clones})</summary>\n\n${blocks}\n\n</details>\n\n`;
+                }
               }
             }
 
