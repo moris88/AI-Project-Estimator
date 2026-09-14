@@ -11,11 +11,12 @@ Utilizzando modelli linguistici avanzati (LLM), l'applicazione analizza lo stack
 - **Configurazione dell'Ambito**: Definisci se il progetto è Frontend, Backend, Fullstack o Mobile.
 - **Generazione PDF**: Esporta le tue stime in un formato PDF professionale pronto per essere condiviso con i clienti.
 - **Interfaccia Moderna**: UI pulita e reattiva costruita con React e Tailwind CSS.
-- **Privacy First**: Le tue chiavi API vengono salvate localmente nel browser (`localStorage`) e non vengono mai inviate a server intermedi.
+- **Privacy First**: Le chiavi API sono salvate localmente nel `localStorage` dell'app e non vengono inviate a server intermedi.
 
 ## 🚀 Tecnologie utilizzate
 
 - **Frontend**: React 19, TypeScript, Vite
+- **Desktop**: Electron, electron-vite, electron-builder
 - **Styling**: Tailwind CSS
 - **Icone**: Lucide React
 - **Generazione PDF**: @react-pdf/renderer
@@ -40,25 +41,37 @@ Assicurati di avere [Node.js](https://nodejs.org/) installato.
    # oppure npm install / yarn install
    ```
 
-3. Avvia l'applicazione desktop in modalità sviluppo:
+3. Scegli la modalità di sviluppo nel file `.env`:
+
+   ```dotenv
+   VITE_APP="desktop"
+   VITE_ENV="development"
+   ```
+
+   I valori supportati per `VITE_APP` sono:
+
+   - `desktop`: avvia l'app Electron.
+   - `web`: avvia solo l'app Vite nel browser.
+
+4. Avvia l'applicazione:
 
    ```bash
    pnpm dev
    ```
 
-   Per avviare soltanto la versione web nel browser usa `pnpm dev:web` e apri `http://localhost:3000`.
+   In modalità `web`, l'app è disponibile su `http://localhost:3000`. In modalità `desktop`, Electron carica il renderer su `http://localhost:5173`.
+
+   Con `VITE_ENV="development"`, la finestra Electron apre automaticamente le DevTools.
 
 ## Distribuzione desktop
 
-Genera gli artefatti nella cartella `dist`:
+Genera gli archivi ZIP x64 per Windows e Linux nella cartella `dist`:
 
 ```bash
-pnpm build:win       # archivio ZIP per Windows x64
-pnpm build:linux     # archivio ZIP per Linux x64
-pnpm build:electron  # entrambi i pacchetti
+pnpm build:electron
 ```
 
-Per impostare un'icona personalizzata, sostituisci l'asset in `resources` con un PNG di almeno 256x256 pixel e aggiungi il relativo percorso alla configurazione `build` in `package.json`.
+Per impostare un'icona personalizzata, aggiungi alla configurazione `build` in `package.json` un PNG di almeno 256x256 pixel presente in `resources`.
 
 ## ⚙️ Configurazione
 
