@@ -6,6 +6,7 @@ import {
 	FileText,
 	FileUp,
 	GraduationCap,
+	Handshake,
 	Layout,
 	Loader2,
 	PlusCircle,
@@ -112,8 +113,8 @@ export const ProjectForm = ({
 		}
 	}
 
-	// Estrae il testo da un PDF e lo incolla nel textarea specificato
-	const handlePastePdfToField = async (
+	// Estrae il testo da un PDF o da un Markdown e lo incolla nel textarea specificato
+	const handlePasteFileToField = async (
 		fieldKey: keyof ProjectInfo,
 		e: React.ChangeEvent<HTMLInputElement>,
 	) => {
@@ -125,7 +126,10 @@ export const ProjectForm = ({
 		setPdfError(null)
 
 		try {
-			const extractedText = await extractPdfText(file)
+			const isMarkdown = file.name.toLowerCase().endsWith('.md')
+			const extractedText = isMarkdown
+				? await file.text()
+				: await extractPdfText(file)
 			if (extractedText) {
 				const currentValue = (projectInfo[fieldKey] as string) || ''
 				const newValue = currentValue
@@ -135,7 +139,7 @@ export const ProjectForm = ({
 			}
 		} catch (error) {
 			setPdfError(
-				error instanceof Error ? error.message : 'Impossibile leggere il PDF.',
+				error instanceof Error ? error.message : 'Impossibile leggere il file.',
 			)
 		} finally {
 			setPdfLoading(false)
@@ -160,11 +164,90 @@ export const ProjectForm = ({
 				</button>
 			</div>
 			<form onSubmit={onSubmit} className="space-y-6">
-				<TechStackSelector
-					className="mt-4 px-6"
-					selectedTechs={selectedTechs}
-					onToggleTech={onToggleTech}
-				/>
+				<fieldset className="mt-4 space-y-2 px-6">
+					<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
+						Livello di Esperienza del Team
+					</legend>
+					<p className="text-slate-500 text-xs dark:text-slate-400">
+						Indica quanto il team conosce già gli strumenti scelti per questo
+						progetto. Considera la familiarità media delle persone che
+						lavoreranno al progetto, non solo gli anni di esperienza
+						complessivi.
+					</p>
+					<div className="grid grid-cols-2 gap-2">
+						<button
+							type="button"
+							onClick={() =>
+								onProjectInfoChange({ experienceLevel: 'beginner' })
+							}
+							className={cn(
+								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
+								projectInfo.experienceLevel === 'beginner'
+									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+							)}
+						>
+							<GraduationCap className="h-4 w-4" />
+							Principiante
+						</button>
+						<button
+							type="button"
+							onClick={() =>
+								onProjectInfoChange({ experienceLevel: 'intermediate' })
+							}
+							className={cn(
+								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
+								projectInfo.experienceLevel === 'intermediate'
+									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+							)}
+						>
+							<Handshake className="h-4 w-4" />
+							Equilibrato
+						</button>
+						<button
+							type="button"
+							onClick={() =>
+								onProjectInfoChange({ experienceLevel: 'experienced' })
+							}
+							className={cn(
+								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
+								projectInfo.experienceLevel === 'experienced'
+									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
+									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+							)}
+						>
+							<Award className="h-4 w-4" />
+							Esperto
+						</button>
+					</div>
+					<div className="space-y-1 text-slate-500 text-xs dark:text-slate-400">
+						<p>
+							<strong className="font-medium text-slate-600 dark:text-slate-300">
+								Principiante:
+							</strong>{' '}
+							il team ha poca esperienza con gli strumenti scelti o con lavori
+							simili. La stima considera circa il 20% di tempo in più per
+							imparare e gestire gli imprevisti.
+						</p>
+						<p>
+							<strong className="font-medium text-slate-600 dark:text-slate-300">
+								Equilibrato:
+							</strong>{' '}
+							il team ha una discreta esperienza con gli strumenti scelti e con
+							lavori simili. La stima non considera il tempo aggiuntivo per
+							imparare nuovi strumenti o gestire imprevisti.
+						</p>
+						<p>
+							<strong className="font-medium text-slate-600 dark:text-slate-300">
+								Esperto:
+							</strong>{' '}
+							il team ha già svolto lavori simili e sa usare gli strumenti
+							scelti in autonomia. La stima considera circa il 10% di tempo in
+							meno.
+						</p>
+					</div>
+				</fieldset>
 
 				<div className="grid grid-cols-2 gap-4 px-6">
 					<fieldset className="space-y-2">
@@ -238,67 +321,12 @@ export const ProjectForm = ({
 					</fieldset>
 				</div>
 
-				<fieldset className="space-y-2 px-6">
-					<legend className="block font-medium text-slate-700 text-sm dark:text-slate-300">
-						Livello di Esperienza del Team
-					</legend>
-					<p className="text-slate-500 text-xs dark:text-slate-400">
-						Indica quanto il team conosce già gli strumenti scelti per questo
-						progetto. Considera la familiarità media delle persone che
-						lavoreranno al progetto, non solo gli anni di esperienza
-						complessivi.
-					</p>
-					<div className="grid grid-cols-2 gap-2">
-						<button
-							type="button"
-							onClick={() =>
-								onProjectInfoChange({ experienceLevel: 'beginner' })
-							}
-							className={cn(
-								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
-								projectInfo.experienceLevel === 'beginner'
-									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
-									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
-							)}
-						>
-							<GraduationCap className="h-4 w-4" />
-							Principiante
-						</button>
-						<button
-							type="button"
-							onClick={() =>
-								onProjectInfoChange({ experienceLevel: 'experienced' })
-							}
-							className={cn(
-								'flex items-center gap-2 rounded-lg border px-3 py-2 font-medium text-xs transition-all',
-								projectInfo.experienceLevel === 'experienced'
-									? 'border-blue-600 bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-950 dark:text-blue-300'
-									: 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
-							)}
-						>
-							<Award className="h-4 w-4" />
-							Esperto
-						</button>
-					</div>
-					<div className="space-y-1 text-slate-500 text-xs dark:text-slate-400">
-						<p>
-							<strong className="font-medium text-slate-600 dark:text-slate-300">
-								Principiante:
-							</strong>{' '}
-							il team ha poca esperienza con gli strumenti scelti o con lavori
-							simili. La stima considera circa il 20% di tempo in più per
-							imparare e gestire gli imprevisti.
-						</p>
-						<p>
-							<strong className="font-medium text-slate-600 dark:text-slate-300">
-								Esperto:
-							</strong>{' '}
-							il team ha già svolto lavori simili e sa usare gli strumenti
-							scelti in autonomia. La stima considera circa il 10% di tempo in
-							meno.
-						</p>
-					</div>
-				</fieldset>
+				<TechStackSelector
+					className="mt-4 px-6"
+					projectInfo={projectInfo}
+					selectedTechs={selectedTechs}
+					onToggleTech={onToggleTech}
+				/>
 
 				{/* Percentuali di margine */}
 				<div className="grid grid-cols-3 gap-3 px-6">
@@ -399,13 +427,14 @@ export const ProjectForm = ({
 								htmlFor="existingContext"
 								className="block font-medium text-slate-700 text-sm dark:text-slate-300"
 							>
-								Stato Attuale / Contesto del Codice
+								Stato Attuale / Contesto del Codice{' '}
+								<span className="font-normal text-red-500">(obbligatorio)</span>
 							</label>
 							<div className="flex gap-1.5">
 								<button
 									type="button"
 									onClick={() => handlePasteClipboard('existingContext')}
-									className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+									className="flex cursor-pointer items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 									title="Incolla dagli appunti"
 								>
 									<Clipboard className="h-3 w-3" />
@@ -414,18 +443,18 @@ export const ProjectForm = ({
 								<button
 									type="button"
 									onClick={() => existingContextPdfRef.current?.click()}
-									className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
-									title="Incolla testo estraendolo da un PDF"
+									className="flex cursor-pointer items-center gap-1 text-nowrap rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+									title="Incolla testo estraendolo da un PDF o da un file Markdown"
 								>
 									<FileUp className="h-3 w-3" />
-									Incolla da PDF
+									Incolla da File
 								</button>
 								<input
 									ref={existingContextPdfRef}
 									type="file"
-									accept="application/pdf,.pdf"
+									accept="application/pdf,.pdf,text/markdown,.md"
 									className="hidden"
-									onChange={(e) => handlePastePdfToField('existingContext', e)}
+									onChange={(e) => handlePasteFileToField('existingContext', e)}
 								/>
 							</div>
 						</div>
@@ -436,13 +465,19 @@ export const ProjectForm = ({
 						<textarea
 							id="existingContext"
 							required
+							aria-required="true"
 							value={projectInfo.existingContext || ''}
 							onChange={(e) =>
 								onProjectInfoChange({ existingContext: e.target.value })
 							}
 							placeholder="Es: sito per prenotare visite già online; login e calendario funzionano, ma manca il pagamento..."
 							rows={3}
-							className="w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
+							className={cn(
+								'w-full resize-y rounded-lg border bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500',
+								projectInfo.existingContext?.trim()
+									? 'border-slate-200 dark:border-slate-700'
+									: 'border-red-300 dark:border-red-800',
+							)}
 						/>
 					</div>
 				)}
@@ -460,7 +495,7 @@ export const ProjectForm = ({
 							<button
 								type="button"
 								onClick={() => handlePasteClipboard('requirements')}
-								className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+								className="flex cursor-pointer items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 								title="Incolla dagli appunti"
 							>
 								<Clipboard className="h-3 w-3" />
@@ -469,18 +504,18 @@ export const ProjectForm = ({
 							<button
 								type="button"
 								onClick={() => requirementsPdfRef.current?.click()}
-								className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
-								title="Incolla testo estraendolo da un PDF"
+								className="flex cursor-pointer items-center gap-1 text-nowrap rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+								title="Incolla testo estraendolo da un PDF o da un file Markdown"
 							>
 								<FileUp className="h-3 w-3" />
-								Incolla da PDF
+								Incolla da File
 							</button>
 							<input
 								ref={requirementsPdfRef}
 								type="file"
-								accept="application/pdf,.pdf"
+								accept="application/pdf,.pdf,text/markdown,.md"
 								className="hidden"
-								onChange={(e) => handlePastePdfToField('requirements', e)}
+								onChange={(e) => handlePasteFileToField('requirements', e)}
 							/>
 						</div>
 					</div>
@@ -498,7 +533,12 @@ export const ProjectForm = ({
 						}
 						placeholder="Es: permettere agli utenti di registrarsi, scegliere una data e pagare la prenotazione con carta..."
 						rows={10}
-						className="w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
+						className={cn(
+							'w-full resize-y rounded-lg border bg-white px-4 py-2 outline-none transition-all focus:ring-2 focus:ring-blue-500 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500',
+							projectInfo.requirements.trim()
+								? 'border-slate-200 dark:border-slate-700'
+								: 'border-red-300 dark:border-red-800',
+						)}
 					/>
 				</div>
 
@@ -514,7 +554,7 @@ export const ProjectForm = ({
 							<button
 								type="button"
 								onClick={() => handlePasteClipboard('notes')}
-								className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+								className="flex cursor-pointer items-center gap-1 rounded bg-slate-100 px-2 py-1 font-medium text-slate-600 text-xs hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 								title="Incolla dagli appunti"
 							>
 								<Clipboard className="h-3 w-3" />
@@ -523,18 +563,18 @@ export const ProjectForm = ({
 							<button
 								type="button"
 								onClick={() => notesPdfRef.current?.click()}
-								className="flex items-center gap-1 rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
-								title="Incolla testo estraendolo da un PDF"
+								className="flex cursor-pointer items-center gap-1 text-nowrap rounded bg-blue-50 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/80"
+								title="Incolla testo estraendolo da un PDF o da un file Markdown"
 							>
 								<FileUp className="h-3 w-3" />
-								Incolla da PDF
+								Incolla da File
 							</button>
 							<input
 								ref={notesPdfRef}
 								type="file"
-								accept="application/pdf,.pdf"
+								accept="application/pdf,.pdf,text/markdown,.md"
 								className="hidden"
-								onChange={(e) => handlePastePdfToField('notes', e)}
+								onChange={(e) => handlePasteFileToField('notes', e)}
 							/>
 						</div>
 					</div>

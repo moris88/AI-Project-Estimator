@@ -1,7 +1,7 @@
 export function createPrompt(
 	techStack: string,
 	scope: 'Frontend' | 'Backend' | 'Full-stack',
-	experienceLevel: 'beginner' | 'experienced',
+	experienceLevel: 'beginner' | 'experienced' | 'intermediate',
 	testingPercentage: number,
 	bufferPercentage: number,
 	changeRequestPercentage: number,
@@ -69,6 +69,7 @@ Applica rigorosamente una delle seguenti soglie minime (1 giornata = 8h).
 Esperienza del Team:
 - Se il team è composto da sviluppatori con esperienza "beginner", applica un coefficiente di complessità del 20% in più rispetto alle stime standard.
 - Se il team è composto da sviluppatori con esperienza "experienced", applica un coefficiente di complessità del 10% in meno rispetto alle stime standard.
+- Se il team è composto da sviluppatori con esperienza "intermediate", applica un coefficiente di complessità standard senza modifiche.
 Attualmente il team è composto da sviluppatori con esperienza "${experienceLevel}".
 
 Calcolo delle Ore:

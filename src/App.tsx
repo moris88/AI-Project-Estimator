@@ -9,9 +9,9 @@ import type { AppSettings, ProjectInfo } from './types'
 
 const EMPTY_PROJECT_INFO: ProjectInfo = {
 	techStack: '',
-	scope: 'Frontend',
+	scope: 'Full-stack',
 	type: 'new',
-	experienceLevel: 'beginner',
+	experienceLevel: 'intermediate',
 	percentage: {
 		testing: 5,
 		buffer: 10,
