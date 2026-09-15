@@ -1,15 +1,18 @@
 import { Plus, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { techStacks } from '../lib/constants'
+import type { ProjectInfo } from '../types'
 import { cn } from '../utils/cn'
 
 interface TechStackSelectorProps {
+	projectInfo: ProjectInfo
 	selectedTechs: string[]
 	onToggleTech: (techValue: string) => void
 	className?: string
 }
 
 export const TechStackSelector = ({
+	projectInfo,
 	selectedTechs,
 	onToggleTech,
 	className = '',
@@ -25,27 +28,37 @@ export const TechStackSelector = ({
 	)
 
 	// Verifica se esiste già un match esatto tra le opzioni predefinite
-	const hasExactMatchInPreset = techStacks.some(
+	const availableTechs = useMemo(
+		() =>
+			projectInfo.scope === 'Full-stack'
+				? techStacks
+				: techStacks.filter((tech) => tech.type === projectInfo.scope),
+		[projectInfo.scope],
+	)
+
+	const hasExactMatchInPreset = availableTechs.some(
 		(tech) =>
 			tech.name.toLowerCase() === query.toLowerCase() ||
 			tech.value.toLowerCase() === query.toLowerCase(),
 	)
 
-	const filteredTechs = techStacks.filter((tech) => {
-		// Esclude sempre gli elementi già selezionati
-		const isAlreadySelected = selectedTechs.includes(tech.value)
-		if (isAlreadySelected) return false
+	const filteredTechs = useMemo(() => {
+		return availableTechs.filter((tech) => {
+			// Esclude sempre gli elementi già selezionati
+			const isAlreadySelected = selectedTechs.includes(tech.value)
+			if (isAlreadySelected) return false
 
-		// Se non c'è ricerca, mostra tutti gli elementi rimanenti
-		if (!techSearch) return true
+			// Se non c'è ricerca, mostra tutti gli elementi rimanenti
+			if (!techSearch) return true
 
-		// Altrimenti applica il filtro per nome e descrizione
-		const q = techSearch.toLowerCase()
-		return (
-			tech.name.toLowerCase().includes(q) ||
-			tech.description.toLowerCase().includes(q)
-		)
-	})
+			// Altrimenti applica il filtro per nome e descrizione
+			const q = techSearch.toLowerCase()
+			return (
+				tech.name.toLowerCase().includes(q) ||
+				tech.description.toLowerCase().includes(q)
+			)
+		})
+	}, [techSearch, selectedTechs, availableTechs])
 
 	const handleToggle = (techValue: string) => {
 		onToggleTech(techValue)

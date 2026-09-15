@@ -153,7 +153,7 @@ export const techStacks = [
 		value: 'React Native',
 		description:
 			'Framework per costruire applicazioni mobili native usando React',
-		type: 'Full-stack',
+		type: 'Frontend',
 	},
 	{
 		name: 'HTML5/CSS3/Vanilla JS (Nativo)',
@@ -238,6 +238,13 @@ export const techStacks = [
 		type: 'Frontend',
 	},
 	{
+		name: 'Next.js',
+		value: 'Next.js',
+		description:
+			'Framework React per la creazione di applicazioni web server-side rendering e static site generation',
+		type: 'Full-stack',
+	},
+	{
 		name: 'Mobile Responsive Design',
 		value: 'Mobile Responsive Design',
 		description:
@@ -250,22 +257,6 @@ export const techStacks = [
 		description:
 			'Sviluppo di applicazioni per dispositivi mobili su piattaforme Android e iOS',
 		type: 'Full-stack',
-	},
-	{
-		name: 'Libreria Sistema',
-		value:
-			'Libreria Sistema (proprietaria di crmpartners, usata per le integrazioni tra sistemi diversi)',
-		description:
-			"Insieme di librerie e strumenti standardizzati per lo sviluppo software all'interno di crmpartners",
-		type: 'Backend',
-	},
-	{
-		name: 'Libreria CRMPartnersLib',
-		value:
-			'Libreria Typescript del SDK di Zoho (proprietaria di crmpartners, usata per i widget per integrarsi con Zoho CRM)',
-		description:
-			"Insieme di librerie Typescript standardizzate per lo sviluppo di widget Zoho CRM all'interno di crmpartners",
-		type: 'Frontend',
 	},
 	{
 		name: 'Server FTP/SFTP',
