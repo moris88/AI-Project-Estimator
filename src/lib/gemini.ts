@@ -4,7 +4,7 @@ import { createPrompt } from './prompt'
 export async function generateEstimateGemini(
 	techStack: string,
 	scope: 'Frontend' | 'Backend' | 'Full-stack',
-	experienceLevel: 'beginner' | 'experienced',
+	experienceLevel: 'beginner' | 'experienced' | 'intermediate',
 	testingPercentage: number,
 	bufferPercentage: number,
 	changeRequestPercentage: number,
