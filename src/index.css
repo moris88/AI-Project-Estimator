@@ -1,3 +1,122 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
+
+.pdf-export-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	width: 794px;
+	pointer-events: none;
+}
+
+.pdf-export {
+	position: static;
+	box-sizing: border-box;
+	width: 794px;
+	padding: 48px;
+	background: #fff;
+	color: #1f2937;
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+	line-height: 1.55;
+}
+
+.pdf-export h1,
+.pdf-export h2,
+.pdf-export h3 {
+	break-after: avoid;
+	color: #111827;
+}
+
+.pdf-export h1 {
+	border-bottom: 1px solid #cbd5e1;
+	padding-bottom: 8px;
+	font-size: 22px;
+}
+
+.pdf-export h2 {
+	margin-top: 24px;
+	font-size: 17px;
+}
+
+.pdf-export h3 {
+	margin-top: 18px;
+	font-size: 14px;
+}
+
+.pdf-export p,
+.pdf-export li {
+	overflow-wrap: anywhere;
+}
+
+.pdf-export ul,
+.pdf-export ol {
+	margin: 10px 0;
+	padding-left: 24px;
+}
+
+.pdf-export ul {
+	list-style: disc outside;
+}
+
+.pdf-export ol {
+	list-style: decimal outside;
+}
+
+.pdf-export li {
+	padding-left: 3px;
+}
+
+.pdf-export ul ul {
+	list-style-type: circle;
+}
+
+.pdf-export ul ul ul {
+	list-style-type: square;
+}
+
+.pdf-export ul > li::marker {
+	font-size: 0.75em;
+}
+
+.pdf-export li + li {
+	margin-top: 4px;
+}
+
+.pdf-export li > ul,
+.pdf-export li > ol {
+	margin: 4px 0;
+}
+
+.pdf-export table {
+	width: 100%;
+	margin: 14px 0;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+.pdf-export th,
+.pdf-export td {
+	border: 1px solid #cbd5e1;
+	padding: 6px;
+	text-align: left;
+	vertical-align: top;
+	overflow-wrap: anywhere;
+}
+
+.pdf-export th {
+	background: #f1f5f9;
+}
+
+.pdf-export tr,
+.pdf-export blockquote {
+	break-inside: avoid;
+}
+
+.pdf-export pre,
+.pdf-export code {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}

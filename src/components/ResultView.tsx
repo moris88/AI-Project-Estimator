@@ -1,4 +1,4 @@
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import html2pdf from 'html2pdf.js'
 import {
 	CheckCircle2,
 	ChevronDown,
@@ -9,12 +9,11 @@ import {
 	Send,
 	Sparkles,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Components } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import type { EstimationResult, ProjectInfo } from '../types'
-import { EstimatePDF } from './EstimatePDF'
+import type { EstimationResult } from '../types'
 
 interface ResultViewProps {
 	result: EstimationResult | null
@@ -22,8 +21,6 @@ interface ResultViewProps {
 	refining: boolean
 	provider: string
 	model: string
-	projectInfo: ProjectInfo
-	selectedTechs: string[]
 	onRefine: (prompt: string) => Promise<void>
 }
 
@@ -93,8 +90,6 @@ export const ResultView = ({
 	refining,
 	provider,
 	model,
-	projectInfo,
-	selectedTechs,
 	onRefine,
 }: ResultViewProps) => {
 	const [refinePrompt, setRefinePrompt] = useState('')
@@ -103,6 +98,9 @@ export const ResultView = ({
 	const [downloadFormat, setDownloadFormat] = useState<'pdf' | 'markdown'>(
 		'pdf',
 	)
+	const [pdfLoading, setPdfLoading] = useState(false)
+	const [pdfError, setPdfError] = useState<string | null>(null)
+	const pdfContentRef = useRef<HTMLDivElement>(null)
 	const [openSections, setOpenSections] = useState({
 		estimate: true,
 		sprints: true,
@@ -127,6 +125,43 @@ export const ResultView = ({
 		link.click()
 		URL.revokeObjectURL(url)
 		setDownloadOpen(false)
+	}
+
+	const handlePdfDownload = async () => {
+		if (pdfLoading) return
+
+		setPdfLoading(true)
+		setPdfError(null)
+
+		try {
+			const content = pdfContentRef.current
+			if (!content) throw new Error('Contenuto Markdown non disponibile.')
+
+			await html2pdf()
+				.set({
+					filename: `${fileBaseName}.pdf`,
+					margin: [5, 5, 5, 5],
+					image: { type: 'jpeg', quality: 0.98 },
+					html2canvas: {
+						backgroundColor: '#ffffff',
+						scale: 2,
+						useCORS: true,
+						windowWidth: 794,
+					},
+					jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+				})
+				.from(content)
+				.save()
+			setDownloadOpen(false)
+		} catch (error) {
+			const errorDetails =
+				error instanceof Error
+					? { name: error.name, message: error.message, stack: error.stack }
+					: { type: typeof error, message: String(error) }
+			setPdfError(errorDetails.message)
+		} finally {
+			setPdfLoading(false)
+		}
 	}
 
 	const toggleSection = (section: 'estimate' | 'sprints') => {
@@ -175,6 +210,14 @@ export const ResultView = ({
 
 	return (
 		<div className="fade-in zoom-in-95 animate-in space-y-8 duration-500">
+			<div className="pdf-export-wrapper" aria-hidden="true">
+				<div ref={pdfContentRef} className="pdf-export">
+					<h1>Documento di Stima Tecnica</h1>
+					<ReactMarkdown remarkPlugins={[remarkGfm]}>
+						{estimateContent}
+					</ReactMarkdown>
+				</div>
+			</div>
 			<div className="prose prose-slate dark:prose-invert max-w-none overflow-y-auto prose-table:rounded-lg rounded-xl border prose-table:border border-slate-200 bg-white p-8 prose-headings:font-bold prose-a:text-blue-600 prose-headings:text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:prose-headings:text-slate-100">
 				<div className="not-prose mb-6 flex items-center justify-between">
 					<div className="flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 font-semibold text-green-600 text-sm dark:bg-green-950 dark:text-green-300">
@@ -222,30 +265,25 @@ export const ResultView = ({
 										}
 										className="mb-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
 									>
-										<option value="pdf">PDF</option>
+										<option value="pdf">PDF (.pdf)</option>
 										<option value="markdown">Markdown (.md)</option>
 									</select>
 									{downloadFormat === 'pdf' ? (
-										<PDFDownloadLink
-											document={
-												<EstimatePDF
-													content={estimateContent}
-													projectInfo={{
-														techStack: selectedTechs.join(', '),
-														scope: projectInfo.scope,
-														type: projectInfo.type,
-														notes: projectInfo.notes,
-														existingContext: projectInfo.existingContext,
-													}}
-												/>
-											}
-											fileName={`${fileBaseName}.pdf`}
-											className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-3 py-2 font-medium text-sm text-white hover:bg-blue-700"
-										>
-											{({ loading: pdfLoading }) =>
-												pdfLoading ? 'Preparazione PDF...' : 'Scarica PDF'
-											}
-										</PDFDownloadLink>
+										<>
+											<button
+												type="button"
+												onClick={handlePdfDownload}
+												disabled={pdfLoading}
+												className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-3 py-2 font-medium text-sm text-white hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+											>
+												{pdfLoading ? 'Preparazione PDF...' : 'Scarica PDF'}
+											</button>
+											{pdfError && (
+												<p className="mt-2 text-red-600 text-xs" role="alert">
+													{pdfError}
+												</p>
+											)}
+										</>
 									) : (
 										<button
 											type="button"

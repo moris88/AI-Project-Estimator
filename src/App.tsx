@@ -155,8 +155,6 @@ export default function App() {
 							refining={refining}
 							provider={settings.provider}
 							model={settings.model}
-							projectInfo={projectInfo}
-							selectedTechs={selectedTechs}
 							onRefine={refineEstimate}
 						/>
 					</div>
